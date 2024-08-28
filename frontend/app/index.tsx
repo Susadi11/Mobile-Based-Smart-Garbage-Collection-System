@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Platform } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,6 +15,7 @@ import ComplainDash from '@/screens/admin/ComplainDash';
 import StoreDash from '@/screens/admin/StoreDash';
 import Map from '@/screens/admin/Map';
 import WelcomePage from '@/screens/WelcomePage';
+import AddBulkPage from '@/screens/user/AddBulkPage';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -26,8 +27,7 @@ const AdminTabs = () => {
       initialRouteName="HomeDash"
       activeColor="#ffffff"
       inactiveColor="#000000"
-      shifting={true}
-      barStyle={styles.floatingBarStyle}
+      barStyle={styles.standardBarStyle} // Use standard bar style
     >
       <Tab.Screen
         name="HomeDash"
@@ -76,54 +76,60 @@ const AdminTabs = () => {
 // User Tabs
 const UserTabs = () => {
   return (
-    <Tab.Navigator
-      initialRouteName="HomePage"
-      activeColor="#ffffff"
-      inactiveColor="#000000"
-      shifting={true}
-      barStyle={styles.floatingBarStyle}
-    >
-      <Tab.Screen
-        name="HomePage"
-        component={HomePage}
-        options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="home" color={color} size={26} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="BulkPage"
-        component={BulkPage}
-        options={{
-          tabBarLabel: 'Bulk',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="warehouse" color={color} size={26} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="ComplainPage"
-        component={ComplainPage}
-        options={{
-          tabBarLabel: 'Complaints',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="alert-circle" color={color} size={26} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="StorePage"
-        component={StorePage}
-        options={{
-          tabBarLabel: 'Store',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="store" color={color} size={26} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+    <Stack.Navigator>
+      <Stack.Screen name="UserTabsMain" options={{ headerShown: false }}>
+        {() => (
+          <Tab.Navigator
+            initialRouteName="HomePage"
+            activeColor="#ffffff"
+            inactiveColor="#000000"
+            barStyle={styles.standardBarStyle}
+          >
+            <Tab.Screen
+              name="HomePage"
+              component={HomePage}
+              options={{
+                tabBarLabel: 'Home',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="home" color={color} size={26} />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="BulkPage"
+              component={BulkPage}
+              options={{
+                tabBarLabel: 'Bulk',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="warehouse" color={color} size={26} />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="ComplainPage"
+              component={ComplainPage}
+              options={{
+                tabBarLabel: 'Complaints',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="alert-circle" color={color} size={26} />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="StorePage"
+              component={StorePage}
+              options={{
+                tabBarLabel: 'Store',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="store" color={color} size={26} />
+                ),
+              }}
+            />
+          </Tab.Navigator>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="AddBulkPage" component={AddBulkPage} />
+    </Stack.Navigator>
   );
 };
 
@@ -153,26 +159,8 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  floatingBarStyle: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    bottom: 20,
-    backgroundColor: '#3d9c56', // Updated color
-    borderRadius: 50,
-    height: 70,
-    overflow: 'hidden',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 5 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5,
-      },
-      android: {
-        elevation: 10,
-      },
-    }),
+  standardBarStyle: {
+    backgroundColor: '#3d9c56', // Standard background color for the nav bar
   },
 });
 
