@@ -7,49 +7,28 @@ import {
   StyleSheet,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { TransactionItem } from './Bulk';
 
 interface BulkFrontProps {
   onAddPress: () => void;
+  transactions: TransactionItem[];
 }
 
-const BulkFront: React.FC<BulkFrontProps> = ({ onAddPress }) => {
+const BulkFront: React.FC<BulkFrontProps> = ({ onAddPress, transactions }) => {
   const [sortOption, setSortOption] = useState('Newest First');
   const [selectedTab, setSelectedTab] = useState('All');
 
-  const transactions = [
-    {
-      id: '1',
-      scheduleType: 'Bulk Waste',
-      garbageTypes: 'Organic',
-      pickupTime: '12.56',
-      pickupDate: '21/7/2024',
-    },
-    {
-        id: '2',
-        scheduleType: 'Normal Scedule',
-        garbageTypes: 'Plastic',
-        pickupTime: '12.56',
-        pickupDate: '23/7/2024',
-    },
-    {
-        id: '3',
-        scheduleType: 'Bulk Waste',
-        garbageTypes: 'Paper',
-        pickupTime: '12.56',
-        pickupDate: '21/7/2024',
-    },
-    {
-        id: '4',
-        scheduleType: 'Bulk Waste',
-        garbageTypes: 'E-waste',
-        pickupTime: '12.56',
-        pickupDate: '21/7/2024',
-    },
-  ];
-
   const filteredTransactions = transactions.filter((item) =>
-    selectedTab === 'All' ? true : item.garbageTypes === selectedTab
+    selectedTab === 'All' ? true : item.garbageTypes.includes(selectedTab)
   );
+
+  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
+    if (sortOption === 'Newest First') {
+      return new Date(b.pickupDate).getTime() - new Date(a.pickupDate).getTime();
+    } else {
+      return new Date(a.pickupDate).getTime() - new Date(b.pickupDate).getTime();
+    }
+  });
 
   return (
     <View style={styles.container}>
@@ -64,8 +43,6 @@ const BulkFront: React.FC<BulkFrontProps> = ({ onAddPress }) => {
           <Picker.Item label="Newest First" value="Newest First" />
           <Picker.Item label="Oldest First" value="Oldest First" />
         </Picker>
-
-     
       </View>
 
       <View style={styles.tabContainer}>
@@ -91,7 +68,7 @@ const BulkFront: React.FC<BulkFrontProps> = ({ onAddPress }) => {
       </View>
 
       <FlatList
-        data={filteredTransactions}
+        data={sortedTransactions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.transactionItem}>
