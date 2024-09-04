@@ -4,9 +4,9 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
+  TextInput,
   StyleSheet,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import { TransactionItem } from './Bulk';
 
 interface BulkFrontProps {
@@ -15,34 +15,31 @@ interface BulkFrontProps {
 }
 
 const BulkFront: React.FC<BulkFrontProps> = ({ onAddPress, transactions }) => {
-  const [sortOption, setSortOption] = useState('Newest First');
   const [selectedTab, setSelectedTab] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredTransactions = transactions.filter((item) =>
-    selectedTab === 'All' ? true : item.garbageTypes.includes(selectedTab)
-  );
-
-  const sortedTransactions = [...filteredTransactions].sort((a, b) => {
-    if (sortOption === 'Newest First') {
-      return new Date(b.pickupDate).getTime() - new Date(a.pickupDate).getTime();
-    } else {
-      return new Date(a.pickupDate).getTime() - new Date(b.pickupDate).getTime();
-    }
-  });
+  const filteredTransactions = transactions
+    .filter((item) =>
+      selectedTab === 'All' ? true : item.garbageTypes.includes(selectedTab)
+    )
+    .filter((item) =>
+      item.scheduleType.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Waste Pickups</Text>
-
-      <View style={styles.filterContainer}>
-        <Picker
-          selectedValue={sortOption}
-          style={styles.picker}
-          onValueChange={(itemValue: string) => setSortOption(itemValue)}
-        >
-          <Picker.Item label="Newest First" value="Newest First" />
-          <Picker.Item label="Oldest First" value="Oldest First" />
-        </Picker>
+      
+      <View style={styles.searchBarContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search..."
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+        />
+        <TouchableOpacity style={styles.fab} onPress={onAddPress}>
+          <Text style={styles.fabText}>+</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.tabContainer}>
@@ -68,7 +65,7 @@ const BulkFront: React.FC<BulkFrontProps> = ({ onAddPress, transactions }) => {
       </View>
 
       <FlatList
-        data={sortedTransactions}
+        data={filteredTransactions}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.transactionItem}>
@@ -79,10 +76,6 @@ const BulkFront: React.FC<BulkFrontProps> = ({ onAddPress, transactions }) => {
           </View>
         )}
       />
-
-      <TouchableOpacity style={styles.fab} onPress={onAddPress}>
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -91,25 +84,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#F7F6F2',
+    backgroundColor: '#FFFFFF', // White background
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
   },
-  filterContainer: {
+  searchBarContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 16,
   },
-  picker: {
-    height: 50,
-    width: 150,
-    borderWidth: 1,
+  searchBar: {
+    height: 40,
+    flex: 1,
     borderColor: '#ccc',
-    backgroundColor: '#fff',
+    borderWidth: 1,
     borderRadius: 8,
+    paddingLeft: 10,
+    backgroundColor: '#fff',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -124,7 +118,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   selectedTab: {
-    backgroundColor: '#B59F59',
+    backgroundColor: '#4CAF50', // Green shade
   },
   tabText: {
     color: '#333',
@@ -134,8 +128,8 @@ const styles = StyleSheet.create({
   },
   transactionItem: {
     padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderWidth: 1, // Outline border
+    borderColor: '#4CAF50', // Light gray border color
     backgroundColor: '#fff',
     marginBottom: 8,
     borderRadius: 8,
@@ -146,20 +140,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   fab: {
-    position: 'absolute',
-    bottom: 16,
-    right: 16,
-    width: 56,
-    height: 56,
+    marginLeft: 8,
+    padding: 8,
     borderRadius: 28,
-    backgroundColor: '#B59F59',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
   },
   fabText: {
     fontSize: 24,
-    color: '#fff',
+    color: '#000', // Black color
   },
 });
 
