@@ -50,8 +50,7 @@ const Form = () => {
     <View style={styles.form}>
       <Text style={styles.title}>Complaint Form</Text>
 
-      <Text style={styles.para}>Please fill out form with your complain. we review your request and follow up with you as soon as possible.</Text>
-
+      
       <Text style={styles.label}>Complaint ID: {complaintId}</Text>
 
       <Text style={styles.label}>Full Name</Text>
@@ -119,7 +118,7 @@ const Form = () => {
 
 const styles = StyleSheet.create({
   form: {
-    width: '90%',
+    width: 350,
     maxWidth: 400,
     backgroundColor: '#fff',
     shadowColor: '#000',
@@ -130,6 +129,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 20,
+    
+    
   },
   para:{
     fontSize:12,
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   label: {
     fontSize: 14,

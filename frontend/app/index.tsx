@@ -15,6 +15,7 @@ import StoreDash from '@/screens/admin/StoreDash';
 import Map from '@/screens/admin/Map';
 import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
+import AddComplaint from '@/screens/user/AddComplaint';
 
 // Import custom TabBar component
 import TabBar from '@/components/NavBar/TabBar';
@@ -53,6 +54,68 @@ const AdminTabs: React.FC = () => (
 );
 
 // User Tabs
+
+const UserTabs = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="UserTabsMain" options={{ headerShown: false }}>
+        {() => (
+          <Tab.Navigator
+            initialRouteName="HomePage"
+            activeColor="#ffffff"
+            inactiveColor="#000000"
+            barStyle={styles.standardBarStyle}
+          >
+            <Tab.Screen
+              name="HomePage"
+              component={HomePage}
+              options={{
+                tabBarLabel: 'Home',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="home" color={color} size={26} />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="BulkPage"
+              component={BulkPage}
+              options={{
+                tabBarLabel: 'Bulk',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="warehouse" color={color} size={26} />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="ComplainPage"
+              component={ComplainPage}
+              options={{
+                tabBarLabel: 'Complaints',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="alert-circle" color={color} size={26} />
+                ),
+              }}
+            />
+            <Tab.Screen
+              name="StorePage"
+              component={StorePage}
+              options={{
+                tabBarLabel: 'Store',
+                tabBarIcon: ({ color }) => (
+                  <MaterialCommunityIcons name="store" color={color} size={26} />
+                ),
+              }}
+            />
+          </Tab.Navigator>
+        )}
+      </Stack.Screen>
+      <Stack.Screen name="AddBulkPage" component={AddBulkPage} />
+
+
+      <Stack.Screen name="AddComplaint" component={AddComplaint}/>
+    </Stack.Navigator>
+  );
+}
 const UserTabs: React.FC = () => (
   <Tab.Navigator
     initialRouteName="HomePage"
@@ -81,6 +144,7 @@ const UserTabs: React.FC = () => (
     />
   </Tab.Navigator>
 );
+
 
 // Main App
 const App: React.FC = () => {
