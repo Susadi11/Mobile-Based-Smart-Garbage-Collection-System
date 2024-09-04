@@ -1,13 +1,35 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Button, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Button, Alert, Platform } from 'react-native';
 import { CheckBox, Input } from 'react-native-elements';
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import MapView, { Marker } from 'react-native-maps';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { app } from '../../firebaseConfig'; // Your Firebase configuration
+import { app } from '../../firebaseConfig';
+import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-const Bulk = () => {
+type RootStackParamList = {
+  BulkPage: undefined;
+  AddBulkPage: { onAddComplete: (newRecord: TransactionItem) => void };
+};
+
+type AddBulkPageRouteProp = RouteProp<RootStackParamList, 'AddBulkPage'>;
+type AddBulkPageNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AddBulkPage'>;
+
+export interface TransactionItem {
+  id: string;
+  scheduleType: string;
+  garbageTypes: string;
+  pickupTime: string;
+  pickupDate: string;
+}
+
+const Bulk: React.FC = () => {
+    const navigation = useNavigation<AddBulkPageNavigationProp>();
+    const route = useRoute<AddBulkPageRouteProp>();
+    const { onAddComplete } = route.params;
+
     const [name, setName] = useState<string>('');
     const [scheduleType, setScheduleType] = useState<string>('');
     const [garbageTypes, setGarbageTypes] = useState<string[]>([]);
@@ -34,13 +56,15 @@ const Bulk = () => {
     };
 
     const handleDateChange = (event: any, selectedDate: Date | undefined) => {
-        setShowDatePicker(false);
-        if (selectedDate) setPickupDate(selectedDate);
+        const currentDate = selectedDate || pickupDate;
+        setShowDatePicker(Platform.OS === 'ios');
+        setPickupDate(currentDate);
     };
 
     const handleTimeChange = (event: any, selectedTime: Date | undefined) => {
-        setShowTimePicker(false);
-        if (selectedTime) setPickupTime(selectedTime);
+        const currentTime = selectedTime || pickupTime;
+        setShowTimePicker(Platform.OS === 'ios');
+        setPickupTime(currentTime);
     };
 
     const handleSubmit = async () => {
@@ -52,9 +76,9 @@ const Bulk = () => {
         const wasteData = {
             name,
             scheduleType,
-            garbageTypes,
+            garbageTypes: garbageTypes.join(', '),
             pickupDate: pickupDate.toISOString(),
-            pickupTime: pickupTime.toISOString(),
+            pickupTime: pickupTime.toLocaleTimeString(),
             location,
             weight: scheduleType === 'bulk' ? weight : null,
         };
@@ -63,14 +87,18 @@ const Bulk = () => {
             const docRef = await addDoc(collection(firestore, 'wasteSchedules'), wasteData);
             console.log('Document written with ID: ', docRef.id);
             Alert.alert('Success', 'Waste scheduling saved successfully');
-            // Reset the form
-            setName('');
-            setScheduleType('');
-            setGarbageTypes([]);
-            setPickupDate(new Date());
-            setPickupTime(new Date());
-            setWeight('');
-            setLocation({ latitude: 37.78825, longitude: -122.4324 });
+            
+            // Call the onAddComplete function with the new record
+            onAddComplete({
+                id: docRef.id,
+                scheduleType,
+                garbageTypes: garbageTypes.join(', '),
+                pickupDate: pickupDate.toISOString(),
+                pickupTime: pickupTime.toLocaleTimeString(),
+            });
+
+            // Navigate back to the BulkPage
+            navigation.goBack();
         } catch (error: unknown) {
             console.error('Error adding document: ', error);
             if (error instanceof Error) {
@@ -118,8 +146,10 @@ const Bulk = () => {
             <Button title="Set Date" onPress={() => setShowDatePicker(true)} />
             {showDatePicker && (
                 <DateTimePicker
+                    testID="dateTimePicker"
                     value={pickupDate}
                     mode="date"
+                    is24Hour={true}
                     display="default"
                     onChange={handleDateChange}
                 />
@@ -129,8 +159,10 @@ const Bulk = () => {
             <Button title="Set Time" onPress={() => setShowTimePicker(true)} />
             {showTimePicker && (
                 <DateTimePicker
+                    testID="dateTimePicker"
                     value={pickupTime}
                     mode="time"
+                    is24Hour={true}
                     display="default"
                     onChange={handleTimeChange}
                 />
@@ -138,23 +170,25 @@ const Bulk = () => {
 
             <Text style={styles.label}>Select Location:</Text>
             <MapView
-                style={styles.map}
-                initialRegion={{
-                    latitude: location.latitude,
-                    longitude: location.longitude,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
-                onPress={(e) => setLocation(e.nativeEvent.coordinate)}
-            >
-                <Marker coordinate={location} />
-            </MapView>
+    style={styles.map}
+    initialRegion={{
+        latitude: 6.9271,  // Colombo, Sri Lanka Latitude
+        longitude: 79.8612, // Colombo, Sri Lanka Longitude
+        latitudeDelta: 0.0922, // Zoom level
+        longitudeDelta: 0.0421, // Zoom level
+    }}
+    onPress={(e) => setLocation(e.nativeEvent.coordinate)}
+>
+    <Marker coordinate={location} />
+</MapView>
+
 
             {scheduleType === 'bulk' && (
                 <Input
                     placeholder="Enter estimated weight (kg)"
                     value={weight}
                     onChangeText={setWeight}
+                    keyboardType="numeric"
                     containerStyle={styles.inputContainer}
                 />
             )}
@@ -193,12 +227,12 @@ const styles = StyleSheet.create({
     },
     map: {
         width: '100%',
-        height: 200,
+        height: 700,
         marginVertical: 15,
     },
 });
 
-const pickerSelectStyles = {
+const pickerSelectStyles = StyleSheet.create({
     inputIOS: {
         fontSize: 16,
         paddingVertical: 12,
@@ -223,6 +257,6 @@ const pickerSelectStyles = {
         marginVertical: 10,
         backgroundColor: '#fff',
     },
-};
+});
 
 export default Bulk;
