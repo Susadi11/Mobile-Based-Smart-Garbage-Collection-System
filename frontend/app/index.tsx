@@ -16,6 +16,7 @@ import StoreDash from '@/screens/admin/StoreDash';
 import Map from '@/screens/admin/Map';
 import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
+import AddComplaint from '@/screens/user/AddComplaint';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialBottomTabNavigator();
@@ -129,6 +130,9 @@ const UserTabs = () => {
         )}
       </Stack.Screen>
       <Stack.Screen name="AddBulkPage" component={AddBulkPage} />
+
+
+      <Stack.Screen name="AddComplaint" component={AddComplaint}/>
     </Stack.Navigator>
   );
 };
