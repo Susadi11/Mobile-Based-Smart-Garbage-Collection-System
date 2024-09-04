@@ -20,6 +20,7 @@
     "@react-native-community/slider": "^4.5.2",
     "@react-native-firebase/app": "^20.4.0",
     "@react-native-firebase/database": "^20.4.0",
+    "@react-native-firebase/firestore": "^20.4.0",
     "@react-native-picker/picker": "^2.7.7",
     "@react-navigation/material-bottom-tabs": "^6.2.29",
     "@react-navigation/native": "^6.1.18",

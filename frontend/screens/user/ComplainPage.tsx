@@ -1,29 +1,22 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import Form from '@/components/vindi/Form'; // Adjust the import path according to your project structure
 
-const ComplainPage: React.FC = () => {
+const ComplainDash: React.FC = () => {
   return (
-      <View style={styles.container}>
-          <Text style={styles.title}>Complain Page</Text>
-      </View>
+    <View style={styles.container}>
+      <Form />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    title: {
-        marginTop: 30,
-        color: 'black',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 2,
-    }
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f7fafc',
+  },
 });
 
-export default ComplainPage;
-
+export default ComplainDash;
