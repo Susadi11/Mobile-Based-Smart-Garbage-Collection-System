@@ -24,18 +24,21 @@ const HomeAd = () => {
           <Text style={styles.actionText}>Pay Bills</Text>
           <Text style={styles.subText}>Acc to Biller</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#FF8B8B' }]}>
+          <Text style={styles.actionText}>Pay Bills</Text>
+          <Text style={styles.subText}>Acc to Biller</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Transaction List */}
       <View style={styles.transactionList}>
         <View style={styles.transactionHeader}>
-          <Text style={styles.transactionTitle}>Transactions</Text>
+          <Text style={styles.transactionTitle}>Schedules</Text>
           <Text style={styles.seeAll}>See All</Text>
         </View>
 
         {/* Transaction Items */}
         <View style={styles.transactionItem}>
-          <Image source={{ uri: 'https://example.com/icon1.png' }} style={styles.transactionIcon} />
           <View>
             <Text style={styles.transactionName}>Restaurant</Text>
             <Text style={styles.transactionLocation}>The Curtain, London</Text>
@@ -43,23 +46,7 @@ const HomeAd = () => {
           <Text style={styles.transactionAmount}>$35.00</Text>
         </View>
 
-        <View style={styles.transactionItem}>
-          <Image source={{ uri: 'https://example.com/icon2.png' }} style={styles.transactionIcon} />
-          <View>
-            <Text style={styles.transactionName}>Grocery Store</Text>
-            <Text style={styles.transactionLocation}>GIANT Food, USA</Text>
-          </View>
-          <Text style={styles.transactionAmount}>$230.00</Text>
-        </View>
-
-        <View style={styles.transactionItem}>
-          <Image source={{ uri: 'https://example.com/icon3.png' }} style={styles.transactionIcon} />
-          <View>
-            <Text style={styles.transactionName}>Payment Receive</Text>
-            <Text style={styles.transactionLocation}>Digital Wallet</Text>
-          </View>
-          <Text style={styles.transactionAmount}>$50.00</Text>
-        </View>
+        
       </View>
     </>
   );
@@ -84,9 +71,7 @@ const styles = StyleSheet.create({
   },
   actionsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    paddingHorizontal: 20,
+   
   },
   actionButton: {
     flex: 1,
