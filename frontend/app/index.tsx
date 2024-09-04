@@ -15,6 +15,9 @@ import StoreDash from '@/screens/admin/StoreDash';
 import Map from '@/screens/admin/Map';
 import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
+import AddProduct from '@/screens/admin/AddProduct';
+import PlaceOrder from '@/screens/user/PlaceOrder';
+ 
 
 // Import custom TabBar component
 import TabBar from '@/components/NavBar/TabBar';
@@ -102,6 +105,14 @@ const App: React.FC = () => {
           <Stack.Screen
             name="AddBulkPage"
             component={AddBulkPage}
+          />
+           <Stack.Screen
+            name="AddProduct"
+            component={AddProduct}
+          />
+          <Stack.Screen
+            name="PlaceOrder"
+            component={PlaceOrder}
           />
         </Stack.Navigator>
     </PaperProvider>
