@@ -16,8 +16,13 @@ import Map from '@/screens/admin/Map';
 import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
 
+import AddComplaint from '@/screens/user/AddComplaint';
+import ComplainRead from '@/screens/user/ComplainRead';
+
+
 // Import custom TabBar component
 import TabBar from '@/components/NavBar/TabBar';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -102,6 +107,14 @@ const App: React.FC = () => {
           <Stack.Screen
             name="AddBulkPage"
             component={AddBulkPage}
+          />
+           <Stack.Screen
+            name="AddComplaint"
+            component={AddComplaint}
+          />
+           <Stack.Screen
+            name="ComplainRead"
+            component={ComplainRead}
           />
         </Stack.Navigator>
     </PaperProvider>

@@ -1,21 +1,57 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import {app} from '../../firebaseConfig' // Ensure the path is correct based on your project structure
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { app } from '../../firebaseConfig'; // Ensure the path is correct based on your project structure
 
+type RootStackParamList = {
+  ComplainRead: { complaintData: any };
+  // other routes...
+};
 
-const Form = () => {
+type FormNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ComplainRead'>;
+
+const Form: React.FC = () => {
+  const navigation = useNavigation<FormNavigationProp>();
+
   const [complaintId, setComplaintId] = useState(() => Math.floor(Math.random() * 1000000).toString());
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [location,setLocation] = useState('');
+  const [location, setLocation] = useState('');
   const [problem, setProblem] = useState('');
 
   const firestore = getFirestore(app);
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateMobile = (mobile: string) => {
+    const mobileRegex = /^[0-9]{10}$/; // Adjust the regex based on the country format
+    return mobileRegex.test(mobile);
+  };
+
   const handleSubmit = async () => {
+    // Basic form validation
+    if (!firstName || !lastName || !mobileNumber || !email || !location || !problem) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
+
+    if (!validateMobile(mobileNumber)) {
+      Alert.alert('Error', 'Please enter a valid mobile number.');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email address.');
+      return;
+    }
+
     const formData = {
       complaintId,
       firstName,
@@ -31,7 +67,10 @@ const Form = () => {
       const docRef = await addDoc(collection(firestore, 'complaints'), formData);
       console.log('Document written with ID: ', docRef.id);
       Alert.alert('Success', 'Complaint submitted successfully!');
-      
+
+      // Navigate to ComplainRead page and pass the form data
+      navigation.navigate('ComplainRead', { complaintData: formData });
+
       // Reset form fields
       setComplaintId(Math.floor(Math.random() * 1000000).toString());
       setFirstName('');
@@ -47,78 +86,83 @@ const Form = () => {
   };
 
   return (
-    <View style={styles.form}>
-      <Text style={styles.title}>Complaint Form</Text>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.form}>
+        <Text style={styles.title}>Complaint Form</Text>
+        
+        <Text style={styles.label}>Complaint ID: {complaintId}</Text>
 
-      
-      <Text style={styles.label}>Complaint ID: {complaintId}</Text>
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your first name"
+          value={firstName}
+          onChangeText={setFirstName}
+        />
 
-      <Text style={styles.label}>Full Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your first name"
-        value={firstName}
-        onChangeText={setFirstName}
-      />
+        <Text style={styles.label}>Last Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your last name"
+          value={lastName}
+          onChangeText={setLastName}
+        />
 
-      <Text style={styles.label}>Last Name</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your last name"
-        value={lastName}
-        onChangeText={setLastName}
-      />
+        <Text style={styles.label}>Mobile Number</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your mobile number"
+          value={mobileNumber}
+          keyboardType="phone-pad"
+          onChangeText={setMobileNumber}
+        />
 
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your email"
+          value={email}
+          keyboardType="email-address"
+          onChangeText={setEmail}
+        />
 
-      <Text style={styles.label}>Mobile Number</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your mobile number"
-        value={mobileNumber}
-        keyboardType="phone-pad"
-        onChangeText={setMobileNumber}
-      />
+        <Text style={styles.label}>Location</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your location"
+          value={location}
+          onChangeText={setLocation}
+        />
 
-      <Text style={styles.label}>Email</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your email"
-        value={email}
-        keyboardType="email-address"
-        onChangeText={setEmail}
-      />
+        <Text style={styles.label}>Problem</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          placeholder="Describe your problem"
+          value={problem}
+          multiline
+          numberOfLines={4}
+          onChangeText={setProblem}
+        />
 
-      
-<Text style={styles.label}>Location</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Enter your location"
-        value={location}
-        onChangeText={setLocation}
-      />
-
-      <Text style={styles.label}>Problem</Text>
-      <TextInput
-        style={[styles.input, styles.textArea]}
-        placeholder="Describe your problem"
-        value={problem}
-        multiline
-        numberOfLines={4}
-        onChangeText={setProblem}
-      />
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Submit</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
   form: {
-    width: 350,
+    width: '100%',
     maxWidth: 400,
     backgroundColor: '#fff',
     shadowColor: '#000',
@@ -129,14 +173,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 20,
-    
-    
-  },
-  para:{
-    fontSize:12,
-    color:'#4a5568',
-    marginBottom:20,
-    backgroundColor:'#d5fddf',
   },
   title: {
     color: '#4a5568',
