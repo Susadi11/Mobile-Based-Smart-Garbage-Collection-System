@@ -15,6 +15,9 @@ import StoreDash from '@/screens/admin/StoreDash';
 import Map from '@/screens/admin/Map';
 import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
+import AddProduct from '@/screens/admin/AddProduct';
+import PlaceOrder from '@/screens/user/PlaceOrder';
+ 
 
 import AddComplaint from '@/screens/user/AddComplaint';
 import ComplainRead from '@/screens/user/ComplainRead';
@@ -109,12 +112,21 @@ const App: React.FC = () => {
             component={AddBulkPage}
           />
            <Stack.Screen
+
             name="AddComplaint"
             component={AddComplaint}
           />
            <Stack.Screen
             name="ComplainRead"
             component={ComplainRead}
+
+            name="AddProduct"
+            component={AddProduct}
+          />
+          <Stack.Screen
+            name="PlaceOrder"
+            component={PlaceOrder}
+
           />
         </Stack.Navigator>
     </PaperProvider>

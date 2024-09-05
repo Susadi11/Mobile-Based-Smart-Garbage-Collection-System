@@ -10,7 +10,11 @@
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#ffffff","permissions": [
+      "CAMERA",
+      "CAMERA_ROLL"
+    ]
+
     },
     "ios": {
       "supportsTablet": true

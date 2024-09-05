@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1, // Outline border
     borderColor: '#4CAF50', // Light gray border color
-    backgroundColor: '#fff',
+    backgroundColor: '#e3e3e3',
     marginBottom: 8,
     borderRadius: 8,
   },
