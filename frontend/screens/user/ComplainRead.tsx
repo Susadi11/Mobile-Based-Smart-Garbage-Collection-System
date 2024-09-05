@@ -1,27 +1,31 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { doc, deleteDoc } from "firebase/firestore"; // Import deleteDoc from Firestore
-import { db } from '@/firebaseConfig';// Assuming your Firebase config file is named firebaseConfig.ts
+import { doc, deleteDoc } from 'firebase/firestore'; // Import deleteDoc from Firestore
+import { db } from '@/firebaseConfig'; // Adjust the import based on your file structure
 import Navbar from '@/components/vindi/NavBar';
+import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-type ComplainReadProps = {
-  route: {
-    params: {
-      complaintData: {
-        complaintId: string;
-        firstName: string;
-        lastName: string;
-        mobileNumber: string;
-        email: string;
-        location: string;
-        problem: string;
-      };
+type RootStackParamList = {
+  ComplainRead: {
+    complaintData: {
+      complaintId: string;
+      firstName: string;
+      lastName: string;
+      mobileNumber: string;
+      email: string;
+      location: string;
+      problem: string;
     };
   };
-  navigation: any; // For navigating back after deletion
 };
 
-const ComplainRead: React.FC<ComplainReadProps> = ({ route, navigation }) => {
+type ComplainReadRouteProp = RouteProp<RootStackParamList, 'ComplainRead'>;
+type ComplainReadNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ComplainRead'>;
+
+const ComplainRead: React.FC = () => {
+  const route = useRoute<ComplainReadRouteProp>();
+  const navigation = useNavigation<ComplainReadNavigationProp>();
   const { complaintData } = route.params;
 
   // Handle Delete Function
@@ -65,7 +69,7 @@ const ComplainRead: React.FC<ComplainReadProps> = ({ route, navigation }) => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Complaint Dashboard</Text>
       </View>
-      <Navbar/>
+      <Navbar />
       <View style={styles.card}>
         <Text style={styles.title}>Complaint Details</Text>
         <Text style={styles.label}>Complaint ID: <Text style={styles.value}>{complaintData.complaintId}</Text></Text>
@@ -101,16 +105,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
-    
   },
-
-
   headerTitle: {
     fontSize: 20,
     color: 'black',
   },
   card: {
-    marginTop:100,
+    marginTop: 100,
     backgroundColor: '#fff',
     borderRadius: 10,
     padding: 20,

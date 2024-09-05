@@ -119,7 +119,9 @@ const App: React.FC = () => {
            <Stack.Screen
             name="ComplainRead"
             component={ComplainRead}
-
+          />
+            
+            <Stack.Screen
             name="AddProduct"
             component={AddProduct}
           />
