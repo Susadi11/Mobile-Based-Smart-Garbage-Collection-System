@@ -19,8 +19,13 @@ import AddProduct from '@/screens/admin/AddProduct';
 import PlaceOrder from '@/screens/user/PlaceOrder';
  
 
+import AddComplaint from '@/screens/user/AddComplaint';
+import ComplainRead from '@/screens/user/ComplainRead';
+
+
 // Import custom TabBar component
 import TabBar from '@/components/NavBar/TabBar';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -107,12 +112,21 @@ const App: React.FC = () => {
             component={AddBulkPage}
           />
            <Stack.Screen
+
+            name="AddComplaint"
+            component={AddComplaint}
+          />
+           <Stack.Screen
+            name="ComplainRead"
+            component={ComplainRead}
+
             name="AddProduct"
             component={AddProduct}
           />
           <Stack.Screen
             name="PlaceOrder"
             component={PlaceOrder}
+
           />
         </Stack.Navigator>
     </PaperProvider>

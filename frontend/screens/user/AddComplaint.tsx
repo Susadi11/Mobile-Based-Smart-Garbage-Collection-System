@@ -1,21 +1,27 @@
 import * as React from 'react';
 import { View,Text,TouchableOpacity,StyleSheet, ScrollView} from 'react-native';
 import Form from '@/components/vindi/Form';
+import Navbar from '@/components/vindi/NavBar';
 
 const AddComplaint: React.FC =() => {
 
     return(
 
         
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        
         <View style={styles.container}>
+        <View style={styles.header}>
+        <Text style={styles.headerTitle}>Complaint Dashboard</Text>
+      </View>
+
+          <Navbar/>
             
                 <Form/>
             
 
 
         </View>
-        </ScrollView>
+        
 
 
     );
@@ -24,8 +30,8 @@ const AddComplaint: React.FC =() => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        
+        
         
     
     },
@@ -40,6 +46,20 @@ const styles = StyleSheet.create({
     scrollContent: {
         alignItems: 'center',
         paddingVertical: 10,
+      },
+      header: {
+        width: 450,
+        height: 60,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+        elevation: 4,
+      },
+      
+    
+      headerTitle: {
+        fontSize: 20,
+        color: 'black',
       },
 
 

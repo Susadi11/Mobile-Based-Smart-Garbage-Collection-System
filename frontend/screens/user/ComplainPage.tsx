@@ -1,32 +1,33 @@
-import * as React from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Navbar from '@/components/vindi/NavBar';
+
+type RootStackParamList = {
+  ComplainDash: undefined;
+  AddComplaint: undefined; // Adjust if you need to pass any parameters
+};
+
+type ComplainDashNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ComplainDash'>;
 
 const ComplainDash: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<ComplainDashNavigationProp>();
+
+  const handleAddComplaint = () => {
+    navigation.navigate('AddComplaint');
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Complain Dashboard</Text>
+        <Text style={styles.headerTitle}>Complaint Dashboard</Text>
       </View>
-
-      {/* Navigation Bar */}
-      <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navText}>Map</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Text style={styles.navText}>ProgressBar</Text>
-        </TouchableOpacity>
-      </View>
-
+        <Navbar/>
+          
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.card}>
-          <Text style={styles.text1}>Welcome, Admin</Text>
+          <Text >Welcome, Admin</Text>
           <Image
             source={{ uri: 'https://www.slnsoftwares.com/images/benefit-complaint-system.webp' }}
             style={styles.cardImage}
@@ -36,7 +37,7 @@ const ComplainDash: React.FC = () => {
           </Text>
           <TouchableOpacity
             style={styles.cardButton}
-            onPress={() =>navigation.navigate('AddComplaint')} // Navigate to AddComplaint
+            onPress={handleAddComplaint} // Navigate to AddComplaint
           >
             <Text style={styles.cardButtonText}>Add Complaint</Text>
           </TouchableOpacity>
@@ -58,28 +59,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
+    
   },
-  text1: {
-    fontSize: 12,
-    marginBottom: 20,
-    marginRight: 220,
-  },
+
+
   headerTitle: {
     fontSize: 20,
     color: 'black',
-  },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: 'gray',
-    paddingVertical: 10,
-  },
-  navItem: {
-    padding: 10,
-  },
-  navText: {
-    color: 'white',
-    fontSize: 16,
   },
   scrollContent: {
     alignItems: 'center',
@@ -107,7 +93,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   cardButton: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#00A36C',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
