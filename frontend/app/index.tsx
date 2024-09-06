@@ -25,6 +25,7 @@ import ComplainRead from '@/screens/user/ComplainRead';
 
 // Import custom TabBar component
 import TabBar from '@/components/NavBar/TabBar';
+import AllComplaints from '@/screens/admin/AllComplaints';
 
 
 const Stack = createNativeStackNavigator();
@@ -119,6 +120,10 @@ const App: React.FC = () => {
            <Stack.Screen
             name="ComplainRead"
             component={ComplainRead}
+          />
+          <Stack.Screen
+            name="AllComplaints"
+            component={AllComplaints}
           />
             
             <Stack.Screen
