@@ -61,8 +61,6 @@ const styles = StyleSheet.create({
     elevation: 4,
     
   },
-
-
   headerTitle: {
     fontSize: 20,
     color: 'black',
