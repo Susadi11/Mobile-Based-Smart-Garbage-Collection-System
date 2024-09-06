@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BulkFront from '@/components/User/BulkFront';
-import { getFirestore, collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig'; // Adjust the import path as needed
 
 type RootStackParamList = {
@@ -51,9 +51,27 @@ const BulkPage: React.FC = () => {
     });
   };
 
+  const handleUpdateTransaction = (transaction: TransactionItem) => {
+    // Navigate to an update page or open a modal for editing
+    
+  };
+
+  const handleDeleteTransaction = async (id: string) => {
+    const firestore = getFirestore(app);
+    await deleteDoc(doc(firestore, 'wasteSchedules', id));
+    setTransactions(prevTransactions => 
+      prevTransactions.filter(transaction => transaction.id !== id)
+    );
+  };
+
   return (
     <View style={styles.container}>
-      <BulkFront onAddPress={handleAddBulk} transactions={transactions} />
+      <BulkFront 
+        onAddPress={handleAddBulk} 
+        transactions={transactions} 
+        onUpdateTransaction={handleUpdateTransaction}
+        onDeleteTransaction={handleDeleteTransaction}
+      />
     </View>
   );
 };
