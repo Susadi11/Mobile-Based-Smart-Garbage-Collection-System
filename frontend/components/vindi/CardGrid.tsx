@@ -1,8 +1,17 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-// Define the card component inside the same file for simplicity
+type RootStackParamList = {
+  ComplainDash: undefined;
+  AllComplaints: undefined;
+  // Add other routes if needed
+};
+
+type CardGridNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 const CardComponent: React.FC<{ title: string; iconName: string; onPress: () => void }> = ({ title, iconName, onPress }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
@@ -12,11 +21,15 @@ const CardComponent: React.FC<{ title: string; iconName: string; onPress: () => 
   );
 };
 
-// Main component that includes the grid layout and cards
 const CardGrid: React.FC = () => {
+  const navigation = useNavigation<CardGridNavigationProp>();
+
   const handlePress = (cardTitle: string) => {
     console.log(`${cardTitle} card pressed`);
-    // Handle card press (e.g., navigation or update state)
+    if (cardTitle === "All Complaints") {
+      navigation.navigate('AllComplaints'); // Navigate to AllComplaints screen
+    }
+    // Add other navigation logic if needed
   };
 
   return (
@@ -45,7 +58,6 @@ const CardGrid: React.FC = () => {
           onPress={() => handlePress("Processing Complaints")}
         />
       </View>
-      
     </View>
   );
 };
