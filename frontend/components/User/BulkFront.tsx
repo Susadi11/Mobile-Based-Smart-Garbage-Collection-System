@@ -65,9 +65,9 @@ const BulkFront: React.FC<BulkFrontProps> = ({
     <View style={styles.transactionItem}>
       <View style={styles.transactionContent}>
         <Text style={styles.transactionTitle}>{item.scheduleType}</Text>
-        <Text>Type: {item.garbageTypes}</Text>
-        <Text>Time: {item.pickupTime}</Text>
-        <Text>Date: {formatDate(item.pickupDate)}</Text>
+        <Text style={styles.transactionText}>Type: {item.garbageTypes}</Text>
+        <Text style={styles.transactionText}>Time: {item.pickupTime}</Text>
+        <Text style={styles.transactionText}>Date: {formatDate(item.pickupDate)}</Text>
       </View>
       <Menu
         visible={menuVisible === item.id}
@@ -143,12 +143,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f3f4f6', // Tailwind bg-gray-100
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#1f2937', // Tailwind text-gray-800
   },
   searchBarContainer: {
     flexDirection: 'row',
@@ -156,13 +157,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchBar: {
-    height: 40,
     flex: 1,
-    borderColor: '#ccc',
+    height: 40,
+    borderColor: '#d1d5db', // Tailwind border-gray-300
     borderWidth: 1,
     borderRadius: 8,
     paddingLeft: 10,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffff', // Tailwind bg-white
   },
   tabContainer: {
     flexDirection: 'row',
@@ -171,19 +172,19 @@ const styles = StyleSheet.create({
   },
   tab: {
     padding: 8,
-    borderRadius: 20,
+    borderRadius: 9999, // Tailwind rounded-full
     borderWidth: 1,
-    borderColor: '#ccc',
-    backgroundColor: '#fff',
+    borderColor: '#d1d5db', // Tailwind border-gray-300
+    backgroundColor: '#ffffff', // Tailwind bg-white
   },
   selectedTab: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#4CAF50', // Tailwind bg-green-500
   },
   tabText: {
-    color: '#333',
+    color: '#4b5563', // Tailwind text-gray-600
   },
   selectedTabText: {
-    color: '#fff',
+    color: '#ffffff', // Tailwind text-white
   },
   transactionItem: {
     flexDirection: 'row',
@@ -191,10 +192,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderWidth: 1,
-    borderColor: '#4CAF50',
-    backgroundColor: '#e3e3e3',
+    borderColor: '#4CAF50', // Tailwind border-green-500
+    backgroundColor: '#ffffff', // Tailwind bg-white
     marginBottom: 8,
     borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
+    elevation: 2,
   },
   transactionContent: {
     flex: 1,
@@ -203,19 +209,29 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 4,
+    color: '#1f2937', // Tailwind text-gray-800
+  },
+  transactionText: {
+    color: '#4b5563', // Tailwind text-gray-600
+    marginBottom: 2,
   },
   fab: {
     marginLeft: 8,
-    padding: 8,
-    borderRadius: 28,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#4CAF50', // Tailwind bg-green-500
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   fabText: {
     fontSize: 24,
-    color: '#000',
+    color: '#ffffff', // Tailwind text-white
   },
   menuDots: {
     fontSize: 24,
     fontWeight: 'bold',
+    color: '#4b5563', // Tailwind text-gray-600
     marginBottom: 60,
   },
 });
