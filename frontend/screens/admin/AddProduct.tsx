@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert, Image } from 'react-native';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { app } from '../../firebaseConfig';
-import { launchImageLibrary } from 'react-native-image-picker';
+import { useNavigation } from '@react-navigation/native'; 
+import { collection, addDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db, storage } from '../../firebaseConfig'; // Import storage from firebaseConfig
+import * as ImagePicker from 'expo-image-picker';
 
 const AddProduct = () => {
     const [name, setName] = useState('');
@@ -12,30 +13,54 @@ const AddProduct = () => {
     const [composition, setComposition] = useState('');
     const [benefits, setBenefits] = useState('');
     const [imageUri, setImageUri] = useState<string | null>(null);
+    const navigation = useNavigation(); // 
 
-    const firestore = getFirestore(app);
-    const storage = getStorage(app);
+    const handleImagePick = async () => {
+        let permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    const handleImagePick = () => {
-        launchImageLibrary({ mediaType: 'photo', quality: 0.8 }, (response) => {
-            if (response.didCancel) {
-                console.log('User cancelled image picker');
-            } else if (response.errorCode) {
-                console.error('ImagePicker Error: ', response.errorCode);
-            } else if (response.assets && response.assets[0]) {
-                setImageUri(response.assets[0]?.uri || null);
-            }
+        if (!permissionResult.granted) {
+            Alert.alert('Permission required', 'You need to allow permission to access the gallery.');
+            return;
+        }
+
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.5, // Reduce the quality
         });
+        
+
+        if (!result.canceled) {
+            setImageUri(result.assets[0].uri);
+        } else {
+            console.log('Image picking was canceled');
+        }
     };
 
     const uploadImage = async () => {
         if (imageUri) {
-            const response = await fetch(imageUri);
-            const blob = await response.blob();
-            const storageRef = ref(storage, `product_images/${Date.now()}`);
-            await uploadBytes(storageRef, blob);
-            const downloadURL = await getDownloadURL(storageRef);
-            return downloadURL;
+            try {
+                const response = await fetch(imageUri);
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch image');
+                }
+                const blob = await response.blob();
+                const storageRef = ref(storage, `product_images/${Date.now()}`);
+                console.log('Uploading to:', storageRef.fullPath); // Debugging upload path
+
+                await uploadBytes(storageRef, blob);
+                const downloadURL = await getDownloadURL(storageRef);
+                console.log('Download URL:', downloadURL); // Log the download URL
+
+                return downloadURL;
+            } catch (error) {
+                console.error('Error uploading image:', error);
+                Alert.alert('Error', 'Failed to upload image');
+            }
+        } else {
+            console.log('No imageUri provided'); // Debugging missing imageUri
         }
         return null;
     };
@@ -57,7 +82,7 @@ const AddProduct = () => {
                 imageUrl,
             };
 
-            const docRef = await addDoc(collection(firestore, 'products'), productData);
+            const docRef = await addDoc(collection(db, 'products'), productData);
             console.log('Document written with ID: ', docRef.id);
             Alert.alert('Success', 'Product published successfully');
             setName('');
@@ -66,6 +91,7 @@ const AddProduct = () => {
             setComposition('');
             setBenefits('');
             setImageUri(null);
+            navigation.goBack(); 
         } catch (error) {
             console.error('Error adding document: ', error);
             Alert.alert('Error', 'An error occurred while adding the product');
@@ -78,7 +104,6 @@ const AddProduct = () => {
                 <Text style={styles.headerText}>Add Product Details</Text>
             </View>
             <View style={styles.form}>
-                
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>Product Name</Text>
                     <TextInput
@@ -101,7 +126,7 @@ const AddProduct = () => {
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>Description</Text>
                     <TextInput
-                        style={[styles.input, { height: 80 }]}
+                        style={[styles.input, { height: 100 }]}
                         placeholder="Enter product description"
                         value={description}
                         onChangeText={setDescription}
@@ -111,7 +136,7 @@ const AddProduct = () => {
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>Composition</Text>
                     <TextInput
-                        style={[styles.input, { height: 80 }]}
+                        style={[styles.input, { height: 100 }]}
                         placeholder="Enter product composition"
                         value={composition}
                         onChangeText={setComposition}
@@ -131,6 +156,7 @@ const AddProduct = () => {
 
                 <TouchableOpacity style={styles.imagePicker} onPress={handleImagePick}>
                     {imageUri ? (
+                        console.log('imageUri----', imageUri),
                         <Image source={{ uri: imageUri }} style={styles.image} />
                     ) : (
                         <Text style={styles.imagePickerText}>Select Product Image</Text>
@@ -144,7 +170,6 @@ const AddProduct = () => {
         </ScrollView>
     );
 };
-
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
@@ -185,8 +210,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingHorizontal: 10,
         paddingVertical: 8,
-        fontSize: 16,
+        fontSize: 16, // Increase font size to make the cursor larger
         color: '#333',
+        height: 40, // Adjust height for better visibility
     },
     imagePicker: {
         borderWidth: 1,
@@ -220,5 +246,7 @@ const styles = StyleSheet.create({
         textTransform: 'uppercase',
     },
 });
+
+ 
 
 export default AddProduct;
