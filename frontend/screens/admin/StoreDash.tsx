@@ -119,7 +119,10 @@ const StoreDash = ({ navigation }: any) => {
                                 <Text style={styles.productComposition}>Composition: {product.composition}</Text>
                                 <Text style={styles.productBenefits}>Benefits: {product.benefits}</Text>
                                 <View style={styles.actionButtons}>
-                                    <TouchableOpacity style={styles.updateButton}>
+                                <TouchableOpacity 
+                                        style={styles.updateButton}
+                                        onPress={() => navigation.navigate('UpdateProduct', { productId: product.id })}
+                                    >
                                         <Text style={styles.updateButtonText}>Update</Text>
                                     </TouchableOpacity>
                                     <TouchableOpacity
