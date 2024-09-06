@@ -6,7 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { app } from '../../firebaseConfig'; // Ensure the path is correct based on your project structure
 
 type RootStackParamList = {
-  ComplainRead: { complaintData: any };
+  ComplainRead: { complaintId: string }; // Pass complaintId instead of entire data
   // other routes...
 };
 
@@ -15,7 +15,6 @@ type FormNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Complai
 const Form: React.FC = () => {
   const navigation = useNavigation<FormNavigationProp>();
 
-  const [complaintId, setComplaintId] = useState(() => Math.floor(Math.random() * 1000000).toString());
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
@@ -53,7 +52,6 @@ const Form: React.FC = () => {
     }
 
     const formData = {
-      complaintId,
       firstName,
       lastName,
       mobileNumber,
@@ -65,14 +63,15 @@ const Form: React.FC = () => {
     try {
       // Save form data to Firestore
       const docRef = await addDoc(collection(firestore, 'complaints'), formData);
-      console.log('Document written with ID: ', docRef.id);
+      const complaintId = docRef.id; // Get the document ID
+
+      console.log('Document written with ID: ', complaintId);
       Alert.alert('Success', 'Complaint submitted successfully!');
 
-      // Navigate to ComplainRead page and pass the form data
-      navigation.navigate('ComplainRead', { complaintData: formData });
+      // Navigate to ComplainRead page with the complaint ID
+      navigation.navigate('ComplainRead', { complaintId });
 
       // Reset form fields
-      setComplaintId(Math.floor(Math.random() * 1000000).toString());
       setFirstName('');
       setLastName('');
       setMobileNumber('');
@@ -89,8 +88,6 @@ const Form: React.FC = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.form}>
         <Text style={styles.title}>Complaint Form</Text>
-        
-        <Text style={styles.label}>Complaint ID: {complaintId}</Text>
 
         <Text style={styles.label}>Full Name</Text>
         <TextInput

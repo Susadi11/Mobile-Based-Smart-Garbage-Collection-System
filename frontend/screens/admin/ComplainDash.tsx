@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import AdminNavBar from '@/components/vindi/AdminNavBar';
+import ListNavbar from '@/components/vindi/ListNavBar';
 import CardGrid from '@/components/vindi/CardGrid';
 
 const ComplainDash: React.FC = () => {
@@ -9,7 +9,7 @@ const ComplainDash: React.FC = () => {
          <View style={styles.header}>
         <Text style={styles.headerTitle}>Complaint Dashboard</Text>
       </View>
-        <AdminNavBar/>
+        <ListNavbar/>
         <Text style={styles.text2}>Summery of Complaints</Text>
         <CardGrid/>
         
