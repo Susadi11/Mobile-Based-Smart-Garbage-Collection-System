@@ -36,24 +36,23 @@ const StorePage = ({ navigation }: any) => {
 
     return (
         <ScrollView style={styles.container}>
-            <ImageBackground
-                source={{ uri: ' https://media.istockphoto.com/id/953464358/photo/hand-holding-fertile-soil-for-plant-to-growing-in-nature-concept.webp?a=1&b=1&s=612x612&w=0&k=20&c=aA94ULeQKWv1Bf6kSnCmz-c2MhJ-DEhnMDG0PE04u7k=' }}
-                style={styles.background}
-                
-            >
-                <View style={styles.overlay}>
-                    <Text style={styles.title}>Exlpore Fertilizers</Text>
-                    <View style={styles.inputContainer}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Search for product"
-                            placeholderTextColor="#888"
-                            value={searchQuery}
-                            onChangeText={text => setSearchQuery(text)}
-                        />
-                    </View>
-                </View>
-            </ImageBackground>
+          <ImageBackground
+    source={{ uri: 'https://m.media-amazon.com/images/I/41san9tTmAL._AC_UF1000,1000_QL80_.jpg' }}   
+>
+    <View style={styles.overlay}>
+        <Text style={styles.title}>Explore Products</Text>
+        <Text style={styles.title2}>Made for plant life 100% organic fertilizer</Text>
+        <View style={styles.inputContainer}>
+            <TextInput
+                style={styles.input}
+                placeholder="Search for product"
+                placeholderTextColor="#888"
+                value={searchQuery}
+                onChangeText={text => setSearchQuery(text)}
+            />
+        </View>
+    </View>
+         </ImageBackground>
 
             {filteredProducts.map(item => (
                 <View key={item.id} style={styles.productCard}>
@@ -63,10 +62,10 @@ const StorePage = ({ navigation }: any) => {
                     <View style={styles.detailsContainer}>
                         <Text style={styles.productName}>{item.name}</Text>
                         <View style={styles.priceContainer}>
-                            <Text style={styles.price}>${item.unitPrice.toFixed(2)}</Text>
+                            <Text style={styles.price}>Rs{item.unitPrice.toFixed(2)}</Text>
                         </View>
                         <Text style={styles.productDescription}>{item.description}</Text>
-                        <Text style={styles.productDescription}>{item.composition}</Text>
+                        <Text style={styles.productDescription}>Composition:  {item.composition}</Text>
                         <Text style={styles.productDescription}>{item.benifits}</Text>
                         <TouchableOpacity style={styles.orderButton} onPress={() => handlePlaceOrder(item)}>
                             <Icon name="shopping-cart" size={20} color="#fff" />
@@ -82,14 +81,14 @@ const StorePage = ({ navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f8f8f8',
+       
     },
     background: {
         width: '100%',
         height: 200,
     },
     overlay: {
-        flex: 1,
+        flex: 3,
         justifyContent: 'center',
         alignItems: 'center',
         paddingVertical: 52,
@@ -97,9 +96,16 @@ const styles = StyleSheet.create({
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     title: {
-        color: '#fff',
+        color: '#ffffff',
         fontWeight: 'bold',
-        fontSize: 24,
+        fontSize: 33,
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    title2: {
+        color: '#ffffff',
+        fontWeight: 'bold',
+        fontSize: 20,
         textAlign: 'center',
         marginBottom: 20,
     },
@@ -136,7 +142,7 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         position: 'relative',
-        height: 200,
+        height: 400,
         borderBottomWidth: 1,
         borderColor: '#e5e7eb',
     },
@@ -149,8 +155,8 @@ const styles = StyleSheet.create({
         padding: 15,
     },
     productName: {
-        fontSize: 18,
-        fontWeight: '600',
+        fontSize: 19.5,
+        fontWeight: 'bold',
         color: '#1f2937',
     },
     priceContainer: {
@@ -162,7 +168,7 @@ const styles = StyleSheet.create({
     price: {
         fontSize: 24,
         fontWeight: '700',
-        color: '#1f2937',
+        color: '#4CAF50',
     },
     productDescription: {
         fontSize: 14,

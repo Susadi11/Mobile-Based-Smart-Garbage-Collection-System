@@ -135,6 +135,10 @@ const App: React.FC = () => {
             component={PlaceOrder}
 
           />
+            <Stack.Screen
+            name="StoreDash"
+            component={StoreDash}
+          />
         </Stack.Navigator>
     </PaperProvider>
   );

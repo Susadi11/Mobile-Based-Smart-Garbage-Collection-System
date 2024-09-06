@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
-import { View, Text, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native';
 import { getFirestore, collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
 
@@ -10,17 +10,18 @@ interface Product {
     unitPrice: string;
     description: string;
     composition: string;
-    benifits: string;
+    benefits: string;
+    imageUrl: string;
 }
 
 const StoreDash = ({ navigation }: any) => {
     const [products, setProducts] = useState<Product[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchProducts = () => {
         const firestore = getFirestore(app);
         const productsCollection = collection(firestore, 'products');
 
-        // Listen for real-time updates
         const unsubscribe = onSnapshot(productsCollection, (querySnapshot) => {
             const fetchedProducts: Product[] = [];
             querySnapshot.forEach((doc) => {
@@ -31,29 +32,44 @@ const StoreDash = ({ navigation }: any) => {
                     unitPrice: data.unitPrice,
                     description: data.description,
                     composition: data.composition,
-                    benifits: data.benifits,
+                    benefits: data.benefits,
+                    imageUrl: data.imageUrl,
                 });
             });
 
             setProducts(fetchedProducts);
         });
 
-        // Cleanup listener on component unmount
         return () => unsubscribe();
     };
+
+    const confirmDelete = (id: string) => {
+        Alert.alert(
+            'Delete Product',
+            'Are you sure you want to delete this product?',
+            [
+                {
+                    text: 'Cancel',
+                    onPress: () => console.log('Delete canceled'),
+                    style: 'cancel',
+                },
+                {
+                    text: 'OK',
+                    onPress: () => handleDelete(id),
+                },
+            ],
+            { cancelable: true }
+        );
+    };
+
     const handleDelete = async (id: string) => {
         try {
             const firestore = getFirestore(app);
             const productDoc = doc(firestore, 'products', id);
-
-            // Delete the product from Firestore
             await deleteDoc(productDoc);
-
-            // Optionally, update the local state to remove the deleted product
             setProducts((prevProducts) =>
                 prevProducts.filter((product) => product.id !== id)
             );
-
             console.log('Product deleted successfully');
         } catch (error) {
             console.error('Error deleting product:', error);
@@ -64,48 +80,66 @@ const StoreDash = ({ navigation }: any) => {
         fetchProducts();
     }, []);
 
+    // Filter products based on search query
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.shadowContainer}>
-                    <View style={styles.header}>
-                        <Text style={styles.headerText}>Products Dashboard</Text>
-                        <TouchableOpacity 
-                            style={styles.addButton}
-                            onPress={() => navigation.navigate('AddProduct')}
-                        >
-                            <Text style={styles.addButtonText}>Add Product</Text>
-                        </TouchableOpacity>
+                <ImageBackground
+                    source={{ uri: 'https://m.media-amazon.com/images/I/41san9tTmAL._AC_UF1000,1000_QL80_.jpg' }}
+                >
+                    <View style={styles.overlay}>
+                        <Text style={styles.title}>Product Dashboard</Text>
+                        <View style={styles.inputContainer}>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Search for product"
+                                placeholderTextColor="#888"
+                                value={searchQuery}
+                                onChangeText={text => setSearchQuery(text)}
+                            />
+                        </View>
                     </View>
-                    {products.map((product) => (
+                </ImageBackground>
+
+                <View style={styles.productsWrapper}>
+                    {filteredProducts.map((product) => (
                         <View key={product.id} style={styles.productContainer}>
-                            <Image source={{ uri: 'https://i.ibb.co/6gzWwSq/Rectangle-20-1.png' }} style={styles.productImage} />
+                            <Image
+                                source={{ uri: product.imageUrl }}
+                                style={styles.productImage}
+                            />
                             <View style={styles.productDetails}>
                                 <Text style={styles.productName}>{product.name}</Text>
-                                <View style={styles.productNameContainer}>
-                                    <Text style={styles.productName}>Price: ${product.unitPrice}</Text>
-                                </View>
+                                <Text style={styles.productPrice}>Price: Rs {product.unitPrice}</Text>
                                 <Text style={styles.productDescription}>{product.description}</Text>
-                                <Text style={styles.productDescription}>{product.composition}</Text>
-                                <Text style={styles.productDescription}>{product.benifits}</Text>
-                                <View style={styles.productFooter}>
-                                    <View style={styles.actionButtons}>
-                                        <TouchableOpacity style={styles.updateButton}>
-                                            <Text style={styles.updateButtonText}>Update</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity 
-                                            style={styles.deleteButton}
-                                            onPress={() => handleDelete(product.id)}
-                                        >
-                                            <Text style={styles.deleteButtonText}>Delete</Text>
-                                        </TouchableOpacity>
-                                    </View>
+                                <Text style={styles.productComposition}>Composition: {product.composition}</Text>
+                                <Text style={styles.productBenefits}>Benefits: {product.benefits}</Text>
+                                <View style={styles.actionButtons}>
+                                    <TouchableOpacity style={styles.updateButton}>
+                                        <Text style={styles.updateButtonText}>Update</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.deleteButton}
+                                        onPress={() => confirmDelete(product.id)}
+                                    >
+                                        <Text style={styles.deleteButtonText}>Delete</Text>
+                                    </TouchableOpacity>
                                 </View>
                             </View>
                         </View>
                     ))}
                 </View>
             </ScrollView>
+            <TouchableOpacity
+                style={styles.fab}
+                onPress={() => navigation.navigate('AddProduct')}
+            >
+                <Text style={styles.fabText}>+</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -116,70 +150,99 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
     },
     scrollContainer: {
-        padding: 10,
+        paddingHorizontal: 0,
     },
-    shadowContainer: {
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-        backgroundColor: '#fff',
-        borderRadius: 8,
+    overlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 52,
+        paddingHorizontal: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
-    header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e5e5e5',
-        marginBottom: 10,
-    },
-    headerText: {
+    title: {
+        color: '#ffffff',
         fontWeight: 'bold',
-        fontSize: 24,
+        fontSize: 33,
+        textAlign: 'center',
+        marginBottom: 20,
+    },
+    inputContainer: {
+        width: '90%',
+        maxWidth: 400,
+        alignItems: 'center',
+    },
+    input: {
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        width: '100%',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        fontSize: 16,
+        color: '#000',
+    },
+    productsWrapper: {
+        flexDirection: 'column',
+        gap: 20,
     },
     productContainer: {
         flexDirection: 'row',
-        paddingVertical: 10,
-        borderBottomWidth: 1,
-        borderBottomColor: '#e5e5e5',
+        padding: 20,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 5,
     },
     productImage: {
-        width: '25%',
+        width: 100,
         height: 100,
         resizeMode: 'cover',
         borderRadius: 8,
     },
     productDetails: {
-        paddingLeft: 10,
+        marginLeft: 15,
         flex: 1,
-        justifyContent: 'center',
-    },
-    productNameContainer: {
-        flexDirection: 'row',
         justifyContent: 'space-between',
     },
     productName: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: 'bold',
-        color: '#4a4a4a',
+        color: '#333',
+    },
+    productPrice: {
+        fontSize: 16,
+        color: '#4CAF50',
+        marginTop: 5,
     },
     productDescription: {
-        fontSize: 12,
-        color: '#7d7d7d',
-        paddingTop: 4,
+        fontSize: 14,
+        color: '#666',
+        marginTop: 5,
     },
-    productFooter: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingTop: 10,
+    productComposition: {
+        fontSize: 12,
+        color: '#666',
+        marginTop: 5,
+    },
+    productBenefits: {
+        fontSize: 12,
+        color: '#666',
+        marginTop: 5,
     },
     actionButtons: {
         flexDirection: 'row',
+        marginTop: 10,
     },
     updateButton: {
         backgroundColor: '#4CAF50',
         paddingVertical: 5,
-        paddingHorizontal: 10,
+        paddingHorizontal: 15,
         borderRadius: 5,
     },
     updateButtonText: {
@@ -190,7 +253,7 @@ const styles = StyleSheet.create({
     deleteButton: {
         backgroundColor: '#e53935',
         paddingVertical: 5,
-        paddingHorizontal: 10,
+        paddingHorizontal: 15,
         borderRadius: 5,
         marginLeft: 10,
     },
@@ -199,16 +262,21 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
     },
-    addButton: {
+    fab: {
+        position: 'absolute',
+        width: 60,
+        height: 60,
+        borderRadius: 30,
         backgroundColor: '#33bbff',
-        paddingVertical: 5,
-        paddingHorizontal: 10,
-        borderRadius: 5,
-        marginRight: 10,
+        justifyContent: 'center',
+        alignItems: 'center',
+        bottom: 100,
+        right: 20,
+        elevation: 8,
     },
-    addButtonText: {
+    fabText: {
         color: '#fff',
-        fontSize: 14,
+        fontSize: 30,
         fontWeight: 'bold',
     },
 });
