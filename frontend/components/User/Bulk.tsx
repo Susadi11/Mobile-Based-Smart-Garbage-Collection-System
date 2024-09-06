@@ -1,118 +1,132 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, Button, Alert, Platform } from 'react-native';
 import { CheckBox, Input } from 'react-native-elements';
 import RNPickerSelect from 'react-native-picker-select';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import MapView, { Marker } from 'react-native-maps';
-import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, updateDoc, doc } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
-import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
   BulkPage: undefined;
-  AddBulkPage: { onAddComplete: (newRecord: TransactionItem) => void };
 };
 
-type AddBulkPageRouteProp = RouteProp<RootStackParamList, 'AddBulkPage'>;
-type AddBulkPageNavigationProp = NativeStackNavigationProp<RootStackParamList, 'AddBulkPage'>;
+type BulkNavigationProp = NativeStackNavigationProp<RootStackParamList, 'BulkPage'>;
 
 export interface TransactionItem {
   id: string;
+  name: string;
   scheduleType: string;
   garbageTypes: string;
   pickupTime: string;
   pickupDate: string;
+  location: { latitude: number; longitude: number };
+  weight?: string | null;
 }
 
-const Bulk: React.FC = () => {
-    const navigation = useNavigation<AddBulkPageNavigationProp>();
-    const route = useRoute<AddBulkPageRouteProp>();
-    const { onAddComplete } = route.params;
+interface BulkProps {
+  existingTransaction?: TransactionItem;
+  onAddComplete: (newRecord: TransactionItem) => void;
+  onUpdateComplete: (updatedRecord: TransactionItem) => void;
+}
 
-    const [name, setName] = useState<string>('');
-    const [scheduleType, setScheduleType] = useState<string>('');
-    const [garbageTypes, setGarbageTypes] = useState<string[]>([]);
-    const [pickupDate, setPickupDate] = useState<Date>(new Date());
-    const [pickupTime, setPickupTime] = useState<Date>(new Date());
-    const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
-    const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
-    const [location, setLocation] = useState({
-        latitude: 37.78825,
-        longitude: -122.4324,
-    });
-    const [weight, setWeight] = useState<string>('');
+const Bulk: React.FC<BulkProps> = ({ existingTransaction, onAddComplete, onUpdateComplete }) => {
+  const navigation = useNavigation<BulkNavigationProp>();
 
-    const firestore = getFirestore(app);
+  const [name, setName] = useState<string>('');
+  const [scheduleType, setScheduleType] = useState<string>('');
+  const [garbageTypes, setGarbageTypes] = useState<string[]>([]);
+  const [pickupDate, setPickupDate] = useState<Date>(new Date());
+  const [pickupTime, setPickupTime] = useState<Date>(new Date());
+  const [showDatePicker, setShowDatePicker] = useState<boolean>(false);
+  const [showTimePicker, setShowTimePicker] = useState<boolean>(false);
+  const [location, setLocation] = useState({
+    latitude: 6.9271,
+    longitude: 79.8612,
+  });
+  const [weight, setWeight] = useState<string | null>(null);
 
-    const garbageOptions = ['Paper', 'Plastic', 'E-waste', 'Organic'];
+  useEffect(() => {
+    if (existingTransaction) {
+      setName(existingTransaction.name);
+      setScheduleType(existingTransaction.scheduleType);
+      setGarbageTypes(existingTransaction.garbageTypes.split(', '));
+      setPickupDate(new Date(existingTransaction.pickupDate));
+      setPickupTime(new Date(`1970-01-01T${existingTransaction.pickupTime}`));
+      setLocation(existingTransaction.location);
+      setWeight(existingTransaction.weight || null);
+    }
+  }, [existingTransaction]);
 
-    const handleGarbageTypeSelection = (type: string) => {
-        setGarbageTypes(prevState =>
-            prevState.includes(type)
-                ? prevState.filter(item => item !== type)
-                : [...prevState, type]
-        );
+  const firestore = getFirestore(app);
+
+  const garbageOptions = ['Paper', 'Plastic', 'E-waste', 'Organic'];
+
+  const handleGarbageTypeSelection = (type: string) => {
+    setGarbageTypes(prevState =>
+      prevState.includes(type)
+        ? prevState.filter(item => item !== type)
+        : [...prevState, type]
+    );
+  };
+
+  const handleDateChange = (event: any, selectedDate: Date | undefined) => {
+    const currentDate = selectedDate || pickupDate;
+    setShowDatePicker(Platform.OS === 'ios');
+    setPickupDate(currentDate);
+  };
+
+  const handleTimeChange = (event: any, selectedTime: Date | undefined) => {
+    const currentTime = selectedTime || pickupTime;
+    setShowTimePicker(Platform.OS === 'ios');
+    setPickupTime(currentTime);
+  };
+
+  const handleSubmit = async () => {
+    if (!name || !scheduleType || garbageTypes.length === 0) {
+      Alert.alert('Error', 'Please fill in all required fields');
+      return;
+    }
+  
+    const wasteData: Omit<TransactionItem, 'id'> = {
+      name,
+      scheduleType,
+      garbageTypes: garbageTypes.join(', '),
+      pickupDate: pickupDate.toISOString(),
+      pickupTime: pickupTime.toLocaleTimeString(),
+      location,
+      weight: scheduleType === 'bulk' ? weight || null : null,
     };
-
-    const handleDateChange = (event: any, selectedDate: Date | undefined) => {
-        const currentDate = selectedDate || pickupDate;
-        setShowDatePicker(Platform.OS === 'ios');
-        setPickupDate(currentDate);
-    };
-
-    const handleTimeChange = (event: any, selectedTime: Date | undefined) => {
-        const currentTime = selectedTime || pickupTime;
-        setShowTimePicker(Platform.OS === 'ios');
-        setPickupTime(currentTime);
-    };
-
-    const handleSubmit = async () => {
-        if (!name || !scheduleType || garbageTypes.length === 0) {
-            Alert.alert('Error', 'Please fill in all required fields');
-            return;
-        }
-
-        const wasteData = {
-            name,
-            scheduleType,
-            garbageTypes: garbageTypes.join(', '),
-            pickupDate: pickupDate.toISOString(),
-            pickupTime: pickupTime.toLocaleTimeString(),
-            location,
-            weight: scheduleType === 'bulk' ? weight : null,
-        };
-
-        try {
-            const docRef = await addDoc(collection(firestore, 'wasteSchedules'), wasteData);
-            console.log('Document written with ID: ', docRef.id);
-            Alert.alert('Success', 'Waste scheduling saved successfully');
-            
-            // Call the onAddComplete function with the new record
-            onAddComplete({
-                id: docRef.id,
-                scheduleType,
-                garbageTypes: garbageTypes.join(', '),
-                pickupDate: pickupDate.toISOString(),
-                pickupTime: pickupTime.toLocaleTimeString(),
-            });
-
-            // Navigate back to the BulkPage
-            navigation.goBack();
-        } catch (error: unknown) {
-            console.error('Error adding document: ', error);
-            if (error instanceof Error) {
-                Alert.alert('Error', error.message);
-            } else {
-                Alert.alert('An unknown error occurred');
-            }
-        }
-    };
+  
+    try {
+      if (existingTransaction) {
+        // Update existing document
+        await updateDoc(doc(firestore, 'wasteSchedules', existingTransaction.id), wasteData);
+        Alert.alert('Success', 'Waste scheduling updated successfully');
+        onUpdateComplete({ id: existingTransaction.id, ...wasteData });
+      } else {
+        // Add new document
+        const docRef = await addDoc(collection(firestore, 'wasteSchedules'), wasteData);
+        const newRecord: TransactionItem = { id: docRef.id, ...wasteData };
+        Alert.alert('Success', 'Waste scheduling saved successfully');
+        onAddComplete(newRecord);
+      }
+      navigation.goBack();
+    } catch (error: unknown) {
+      console.error('Error adding/updating document: ', error);
+      if (error instanceof Error) {
+        Alert.alert('Error', error.message);
+      } else {
+        Alert.alert('An unknown error occurred');
+      }
+    }
+  };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.heading}>Waste Scheduling</Text>
-
+      <Text style={styles.heading}>{existingTransaction ? 'Update Waste Scheduling' : 'New Waste Scheduling'}</Text>
             <Input
                 placeholder="Enter your name"
                 value={name}
@@ -183,17 +197,17 @@ const Bulk: React.FC = () => {
 </MapView>
 
 
-            {scheduleType === 'bulk' && (
-                <Input
-                    placeholder="Enter estimated weight (kg)"
-                    value={weight}
-                    onChangeText={setWeight}
-                    keyboardType="numeric"
-                    containerStyle={styles.inputContainer}
-                />
-            )}
+{scheduleType === 'bulk' && (
+  <Input
+    placeholder="Enter estimated weight (kg)"
+    value={weight || ''}
+    onChangeText={(text) => setWeight(text || null)}
+    keyboardType="numeric"
+    containerStyle={styles.inputContainer}
+  />
+)}
 
-            <Button title="Submit" onPress={handleSubmit} />
+          <Button title={existingTransaction ? 'Update' : 'Submit'} onPress={handleSubmit} />
         </ScrollView>
     );
 };

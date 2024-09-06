@@ -4,21 +4,28 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BulkFront from '@/components/User/BulkFront';
 import { getFirestore, collection, getDocs, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import { app } from '../../firebaseConfig'; // Adjust the import path as needed
+import { app } from '../../firebaseConfig';
 
 type RootStackParamList = {
   BulkPage: undefined;
-  AddBulkPage: { onAddComplete: (newRecord: TransactionItem) => void };
+  AddBulkPage: {
+    transaction?: TransactionItem;
+    onAddComplete: (newRecord: TransactionItem) => void;
+    onUpdateComplete: (updatedRecord: TransactionItem) => void;
+  };
 };
 
 type BulkPageNavigationProp = NativeStackNavigationProp<RootStackParamList, 'BulkPage'>;
 
 export interface TransactionItem {
   id: string;
+  name: string;
   scheduleType: string;
   garbageTypes: string;
   pickupTime: string;
   pickupDate: string;
+  location: { latitude: number; longitude: number };
+  weight?: string | null;
 }
 
 const BulkPage: React.FC = () => {
@@ -32,7 +39,7 @@ const BulkPage: React.FC = () => {
     const querySnapshot = await getDocs(q);
     const fetchedTransactions: TransactionItem[] = querySnapshot.docs.map(doc => ({
       id: doc.id,
-      ...doc.data() as Omit<TransactionItem, 'id'>
+      ...(doc.data() as Omit<TransactionItem, 'id'>)
     }));
     setTransactions(fetchedTransactions);
   };
@@ -47,28 +54,36 @@ const BulkPage: React.FC = () => {
     navigation.navigate('AddBulkPage', {
       onAddComplete: (newRecord: TransactionItem) => {
         setTransactions(prevTransactions => [newRecord, ...prevTransactions]);
-      }
+      },
+      onUpdateComplete: () => {} // This won't be used for new records
     });
   };
 
   const handleUpdateTransaction = (transaction: TransactionItem) => {
-    // Navigate to an update page or open a modal for editing
-    
+    navigation.navigate('AddBulkPage', {
+      transaction,
+      onAddComplete: () => {}, // This won't be used for updates
+      onUpdateComplete: (updatedRecord: TransactionItem) => {
+        setTransactions(prevTransactions =>
+          prevTransactions.map(t => t.id === updatedRecord.id ? updatedRecord : t)
+        );
+      }
+    });
   };
 
   const handleDeleteTransaction = async (id: string) => {
     const firestore = getFirestore(app);
     await deleteDoc(doc(firestore, 'wasteSchedules', id));
-    setTransactions(prevTransactions => 
+    setTransactions(prevTransactions =>
       prevTransactions.filter(transaction => transaction.id !== id)
     );
   };
 
   return (
     <View style={styles.container}>
-      <BulkFront 
-        onAddPress={handleAddBulk} 
-        transactions={transactions} 
+      <BulkFront
+        onAddPress={handleAddBulk}
+        transactions={transactions}
         onUpdateTransaction={handleUpdateTransaction}
         onDeleteTransaction={handleDeleteTransaction}
       />
