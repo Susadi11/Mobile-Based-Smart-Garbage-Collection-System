@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   cardButton: {
-    backgroundColor: '#00A36C',
+    backgroundColor: '#4CAF50',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
@@ -134,8 +134,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 25,
     color: 'black',
+    fontWeight:'bold',
   },
   mainContent: {
     flex: 1,

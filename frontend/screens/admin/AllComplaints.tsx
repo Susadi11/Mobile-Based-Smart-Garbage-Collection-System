@@ -63,9 +63,13 @@ const AllComplaints: React.FC = () => {
   const renderComplaint = ({ item }: { item: Complaint }) => (
     <TouchableOpacity onPress={() => setSelectedComplaint(item)}>
       <View style={styles.card}>
-        <Text style={styles.title}>Complaint ID: {item.complaintId}</Text>
-        <Text style={styles.text}>Problem: {item.problem}</Text>
-        <Text style={styles.text1}>Status: {item.status}</Text>
+        {/* Add the icon here */}
+        <Icon name="book" size={13} color="#ff6347" style={styles.cardIcon} />
+        <View style={styles.cardContent}>
+          <Text style={styles.title}>Complaint ID: {item.complaintId}</Text>
+          <Text style={styles.text}>Problem: {item.problem}</Text>
+          <Text style={styles.statusText}>Status: {item.status}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -154,8 +158,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   headerTitle: {
-    fontSize: 20,
-    color: "black",
+    fontSize: 25,
+    color: 'black',
+    fontWeight:'bold',
   },
   complaintCountContainer: {
     flexDirection: "row",
@@ -194,6 +199,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   card: {
+    flexDirection: "row", // Ensures the icon and text are side-by-side
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
@@ -203,6 +209,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 3,
+  },
+  cardIcon: {
+    marginRight: 15,
+    
+  },
+  cardContent: {
+    flex: 1,
   },
   title: {
     fontSize: 18,
@@ -215,10 +228,8 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 5,
   },
-  text1:{
-
-    color:'red',
-
+  statusText: {
+    color: "black",
   },
   modalOverlay: {
     flex: 1,
@@ -239,31 +250,28 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
   },
   modalText: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   statusOptions: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     width: "100%",
-    marginVertical: 10,
+    marginTop: 20,
   },
   statusButton: {
-    flex: 1,
+    backgroundColor: "#4CAF50",
     padding: 10,
-    marginHorizontal: 5,
     borderRadius: 5,
-    backgroundColor: "#4caf50",
-    alignItems: "center",
   },
   statusButtonText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 16,
   },
 });
 

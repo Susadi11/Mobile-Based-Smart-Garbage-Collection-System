@@ -50,7 +50,7 @@ const AdminNavBar: React.FC = () => {
 const styles = StyleSheet.create({
   navbar: {
     flexDirection: 'row',
-    backgroundColor: '#00A36C', // Modern blue background
+    backgroundColor: '#4CAF50', 
     justifyContent: 'space-around', // Equal space between icons
     alignItems: 'center',
     paddingVertical: 7,
