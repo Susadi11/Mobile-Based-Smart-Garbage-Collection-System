@@ -58,8 +58,10 @@ const styles = StyleSheet.create({
       
     
       headerTitle: {
-        fontSize: 20,
+        fontSize: 25,
         color: 'black',
+        fontWeight:'bold',
+        marginRight:58,
       },
 
 

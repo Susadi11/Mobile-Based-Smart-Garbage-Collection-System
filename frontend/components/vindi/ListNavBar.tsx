@@ -66,7 +66,7 @@ const ListNavbar: React.FC = () => {
 const styles = StyleSheet.create({
   navbar: {
     flexDirection: 'row',
-    backgroundColor: '#00A36C',
+    backgroundColor: '#4CAF50',
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingVertical: 7,
@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 5,
+    height:55,
   },
   navItem: {
     flexDirection: 'column',

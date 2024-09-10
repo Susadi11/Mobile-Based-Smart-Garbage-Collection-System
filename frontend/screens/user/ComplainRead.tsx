@@ -217,8 +217,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 25,
     color: 'black',
+    fontWeight:'bold',
   },
   scrollViewContent: {
     padding: 16,
@@ -258,7 +259,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#3182ce', // Blue color for update button
+    backgroundColor: '#4CAF50', // Blue color for update button
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 4,
