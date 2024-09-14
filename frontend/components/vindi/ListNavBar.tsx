@@ -42,19 +42,19 @@ const ListNavbar: React.FC = () => {
         <View style={styles.listContainer}>
           {/* Box Icon 1 */}
           <TouchableOpacity style={styles.boxItem}>
-            <Icon name="profile" size={28} color="#ffffff" />
+            <Icon name="profile" size={28} color="black" />
             <Text style={styles.boxText}>Profile</Text>
           </TouchableOpacity>
 
           {/* Box Icon 2 */}
           <TouchableOpacity style={styles.boxItem}>
-            <Icon name="map" size={28} color="#ffffff" />
+            <Icon name="map" size={28} color="black" />
             <Text style={styles.boxText}>Map</Text>
           </TouchableOpacity>
 
           {/* Box Icon 3 */}
           <TouchableOpacity style={styles.boxItem}>
-            <Icon name="history" size={28} color="#ffffff" />
+            <Icon name="history" size={28} color="black" />
             <Text style={styles.boxText}>History</Text>
           </TouchableOpacity>
         </View>
@@ -83,12 +83,12 @@ const styles = StyleSheet.create({
     marginLeft:300,
   },
   navText: {
-    color: '#ffffff',
+    color: 'black',
     fontSize: 14,
     marginTop: 4,
   },
   listContainer: {
-    backgroundColor: '#00875A',
+    backgroundColor: '#ffffff',
     paddingVertical: 10,
     borderTopWidth: 1,
     borderColor: '#ffffff',
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   boxText: {
-    color: '#ffffff',
+    color: 'black',
     fontSize: 16,
     marginLeft: 10,
   },
