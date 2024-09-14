@@ -7,6 +7,8 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type RootStackParamList = {
   ComplainDash: undefined;
   AllComplaints: undefined;
+  PendingComplaints:undefined;
+  
   // Add other routes if needed
 };
 
@@ -28,6 +30,10 @@ const CardGrid: React.FC = () => {
     console.log(`${cardTitle} card pressed`);
     if (cardTitle === "All Complaints") {
       navigation.navigate('AllComplaints'); // Navigate to AllComplaints screen
+    }
+    console.log(`${cardTitle} card pressed`);
+    if (cardTitle === "Pending Complaints") {
+      navigation.navigate('PendingComplaints'); // Navigate to AllComplaints screen
     }
     // Add other navigation logic if needed
   };
@@ -65,13 +71,13 @@ const CardGrid: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
     flexDirection: "column",
+    
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 10,
+    marginBottom: 5,
   },
   card: {
     backgroundColor: "#fff",

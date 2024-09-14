@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { View, Text, StyleSheet,ScrollView} from 'react-native';
 import MapView from 'react-native-maps';  // Import MapView
-import ListNavbar from '@/components/vindi/ListNavBar';
+
 import CardGrid from '@/components/vindi/CardGrid';
 
 const ComplainDash: React.FC = () => {
@@ -12,13 +12,11 @@ const ComplainDash: React.FC = () => {
         <Text style={styles.headerTitle}>Complaint Dashboard</Text>
       </View>
       
-
-      <ListNavbar />
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <Text style={styles.text2}>Summary of Complaints</Text>
+      
       <CardGrid />
 
-      <Text style={styles.text2}>Check Complaints Areas</Text>
+      
 
       {/* Placeholder for the map at the bottom */}
       
@@ -68,6 +66,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginTop: 10,
     fontWeight: 'bold',
+    marginRight:150,
     
   },
   headerTitle: {
@@ -80,7 +79,7 @@ const styles = StyleSheet.create({
   map: {
     width: '90%',
     height: 200,  // You can adjust the height as per your UI design
-    marginTop: 20,
+    marginBottom:80,
     
 
   },
