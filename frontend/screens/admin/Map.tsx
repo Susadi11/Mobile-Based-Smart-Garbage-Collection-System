@@ -1,23 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Alert, Text, Image } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
-import Slider from '@react-native-community/slider';
-import { BlurView } from 'expo-blur';
-import attractions from '../../assets/data_scripts/attractions.json';
-import ColorList from "../../components/test_components/ColorList";
+import { getFirestore, collection, onSnapshot } from 'firebase/firestore';
+import { app } from '../../firebaseConfig';
 
-interface Attraction {
-    name: string;
-    latitude: number;
-    longitude: number;
-    description?: string;
+interface WasteSchedule {
+  id: string;
+  name: string;
+  scheduleType: string;
+  garbageTypes: string;
+  pickupTime: string;
+  pickupDate: string;
+  location: { latitude: number; longitude: number };
 }
 
 const Map: React.FC = () => {
     const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-    const [radius, setRadius] = useState(5); // default to 5 km
-    const [filteredAttractions, setFilteredAttractions] = useState<Attraction[]>([]);
+    const [wasteSchedules, setWasteSchedules] = useState<WasteSchedule[]>([]);
+
+    const firestore = getFirestore(app);
+
+    useEffect(() => {
+        const requestLocationPermission = async () => {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                console.log('Location permission denied');
+                return;
+            }
+            getCurrentLocation();
+        };
+        requestLocationPermission();
+
+        // Subscribe to waste schedules
+        const unsubscribe = onSnapshot(collection(firestore, 'wasteSchedules'), (snapshot) => {
+            const schedules: WasteSchedule[] = [];
+            snapshot.forEach((doc) => {
+                schedules.push({ id: doc.id, ...doc.data() } as WasteSchedule);
+            });
+            setWasteSchedules(schedules);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const getCurrentLocation = async () => {
+        try {
+            const { coords } = await Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.High,
+            });
+            setLocation({
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+            });
+        } catch (error) {
+            console.warn(error);
+        }
+    };
+
     const mapStyle = [
         {
             "elementType": "geometry",
@@ -208,70 +248,8 @@ const Map: React.FC = () => {
         }
     ];
 
-    const getCurrentLocation = async () => {
-        try {
-            const { coords } = await Location.getCurrentPositionAsync({
-                accuracy: Location.Accuracy.High,
-            });
-            const currentLocation = {
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-            };
-            setLocation(currentLocation);
-            console.log('Current location:', currentLocation);
-        } catch (error) {
-            console.warn(error);
-            Alert.alert('Error', 'Failed to get current location');
-        }
-    };
-
-    useEffect(() => {
-        const requestLocationPermission = async () => {
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                Alert.alert('Location permission denied');
-                return;
-            }
-            getCurrentLocation();
-        };
-        requestLocationPermission();
-    }, []);
-
-    useEffect(() => {
-        if (location) {
-            const nearbyAttractions = attractions.attractions.filter((attraction: Attraction) => {
-                const distance = getDistanceFromLatLonInKm(
-                    location.latitude,
-                    location.longitude,
-                    attraction.latitude,
-                    attraction.longitude
-                );
-                return distance <= radius;
-            });
-            setFilteredAttractions(nearbyAttractions);
-        }
-    }, [location, radius]);
-
-    const getDistanceFromLatLonInKm = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-        const R = 6371; // Radius of the earth in km
-        const dLat = deg2rad(lat2 - lat1);
-        const dLon = deg2rad(lon2 - lon1);
-        const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        const distance = R * c; // Distance in km
-        return distance;
-    };
-
-    const deg2rad = (deg: number): number => {
-        return deg * (Math.PI / 180);
-    };
-
     return (
         <View style={styles.container}>
-            <ColorList color={"#d8b357"} />
             <MapView
                 provider={PROVIDER_GOOGLE}
                 customMapStyle={mapStyle}
@@ -285,31 +263,16 @@ const Map: React.FC = () => {
                 showsUserLocation={true}
                 followsUserLocation={true}
             >
-                {filteredAttractions.map((attraction, index) => (
+                {wasteSchedules.map((schedule) => (
                     <Marker
-                        key={index}
-                        coordinate={{ latitude: attraction.latitude, longitude: attraction.longitude }}
-                        title={attraction.name}
-                        description={attraction.description}
-                    >
-                        <Image source={require('../../assets/icons/MapPin2.png')} style={{height: 35, width:35 }} />
-                    </Marker>
+                        key={schedule.id}
+                        coordinate={schedule.location}
+                        title={schedule.name}
+                        description={`${schedule.scheduleType} - ${schedule.garbageTypes}`}
+                        pinColor="red"
+                    />
                 ))}
             </MapView>
-            <BlurView intensity={60} style={styles.sliderContainer}>
-                <Slider
-                    style={styles.slider}
-                    minimumValue={10}
-                    maximumValue={500}
-                    step={1}
-                    value={radius}
-                    onValueChange={(value) => setRadius(value)}
-                    minimumTrackTintColor="#3f51b5"
-                    maximumTrackTintColor="rgba(255, 255, 255, 0.8)"
-                    thumbTintColor="#3f51b5"
-                />
-                <Text style={styles.sliderValue}>{radius} km</Text>
-            </BlurView>
         </View>
     );
 };
@@ -321,9 +284,34 @@ const styles = StyleSheet.create({
     map: {
         ...StyleSheet.absoluteFillObject,
     },
-    sliderContainer: {
+    markerContainer: {
+        width: 80,
+        height: 60,
+        alignItems: 'center',
+    },
+    markerPin: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'red',
+        borderWidth: 2,
+        borderColor: 'white',
+    },
+    markerTextContainer: {
+        backgroundColor: 'white',
+        borderRadius: 10,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        marginTop: 5,
+    },
+    markerText: {
+        color: 'black',
+        fontWeight: 'bold',
+        fontSize: 12,
+    },
+    infoContainer: {
         position: 'absolute',
-        bottom: 120,
+        bottom: 20,
         left: 20,
         right: 20,
         padding: 16,
@@ -332,20 +320,10 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255, 255, 255, 0.5)',
         borderWidth: 1,
     },
-    slider: {
-        width: '100%',
-        height: 40,
-    },
-    sliderText: {
-        color: 'black',
-        fontSize: 16,
-        marginBottom: 8
-    },
-    sliderValue: {
-        textAlign: 'center',
-        marginTop: 8,
-        fontSize: 16,
+    infoText: {
         color: 'white',
+        fontSize: 14,
+        marginBottom: 4,
         textShadowColor: 'rgba(0, 0, 0, 0.75)',
         textShadowOffset: {width: -1, height: 1},
         textShadowRadius: 10
