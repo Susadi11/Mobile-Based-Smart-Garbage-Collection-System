@@ -131,6 +131,7 @@ const App: React.FC = () => {
           <Stack.Screen name="StoreDash" component={StoreDash} />
           <Stack.Screen name="UpdateProduct" component={UpdateProduct} />
           <Stack.Screen name="StorePage" component={StorePage} />
+          <Stack.Screen name="PendingComplaints" component={PendingComplaints} />
         </Stack.Navigator>
     </PaperProvider>
   );
