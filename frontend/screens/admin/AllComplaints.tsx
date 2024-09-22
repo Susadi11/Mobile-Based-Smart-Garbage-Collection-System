@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Button, TextInput } from "react-native";
-import { getDocs, collection } from "firebase/firestore"; // Firestore functions
-import { db } from "@/firebaseConfig"; // Adjust this import based on your Firebase setup
-import AdminNavBar from "@/components/vindi/AdminNavBar";
+import { getDocs, collection, doc, updateDoc } from "firebase/firestore"; // Firestore functions
+import { db } from "@/firebaseConfig";
 import Icon from "react-native-vector-icons/FontAwesome"; // Import FontAwesome icons
 
 interface Complaint {
@@ -44,15 +43,28 @@ const AllComplaints: React.FC = () => {
     fetchComplaints();
   }, []);
 
-  // Handle status change for each complaint
-  const handleStatusChange = (status: string) => {
+  // Handle status change and update Firestore
+  const handleStatusChange = async (status: string) => {
     if (selectedComplaint) {
-      setComplaints((prevComplaints) =>
-        prevComplaints.map((complaint) =>
-          complaint.complaintId === selectedComplaint.complaintId ? { ...complaint, status } : complaint
-        )
-      );
-      setSelectedComplaint({ ...selectedComplaint, status }); // Update the selected complaint's status
+      const complaintRef = doc(db, "complaints", selectedComplaint.complaintId); // Reference to the specific complaint
+      try {
+        // Update the status in Firestore
+        await updateDoc(complaintRef, {
+          status: status,
+        });
+
+        // Update the status locally
+        setComplaints((prevComplaints) =>
+          prevComplaints.map((complaint) =>
+            complaint.complaintId === selectedComplaint.complaintId
+              ? { ...complaint, status }
+              : complaint
+          )
+        );
+        setSelectedComplaint({ ...selectedComplaint, status });
+      } catch (error) {
+        console.error("Error updating status: ", error);
+      }
     }
   };
 
@@ -79,7 +91,6 @@ const AllComplaints: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Complaints</Text>
       </View>
-      <AdminNavBar />
 
       <View style={styles.complaintCountContainer}>
         <Icon name="list-alt" size={30} color="#4caf50" />
@@ -127,8 +138,8 @@ const AllComplaints: React.FC = () => {
                 <TouchableOpacity onPress={() => handleStatusChange("Pending")} style={styles.statusButton}>
                   <Text style={styles.statusButtonText}>Pending</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusChange("Progressing")} style={styles.statusButton}>
-                  <Text style={styles.statusButtonText}>Progressing</Text>
+                <TouchableOpacity onPress={() => handleStatusChange("Processing")} style={styles.statusButton}>
+                  <Text style={styles.statusButtonText}>Processing</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleStatusChange("Resolved")} style={styles.statusButton}>
                   <Text style={styles.statusButtonText}>Resolved</Text>

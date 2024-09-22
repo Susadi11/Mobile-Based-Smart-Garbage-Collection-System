@@ -1,3 +1,4 @@
+// Import necessary modules
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -23,11 +24,13 @@ import UpdateProduct from '@/screens/admin/UpdateProduct';
 import AddComplaint from '@/screens/user/AddComplaint';
 import ComplainRead from '@/screens/user/ComplainRead';
 import AllComplaints from '@/screens/admin/AllComplaints';
+import PendingComplaints from '@/screens/admin/PendingComplaints';
 
+// Define stack and tab navigators
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Animated icon component to retain animation
+// Animated icon component to apply scale animation
 const AnimatedIcon: React.FC<{ routeName: string; focused: boolean; color: string }> = ({ routeName, focused, color }) => {
   const scale = useSharedValue(focused ? 1 : 0);
 
@@ -65,7 +68,7 @@ const AnimatedIcon: React.FC<{ routeName: string; focused: boolean; color: strin
   return <Animated.View style={animatedStyle}>{renderIcon(routeName)}</Animated.View>;
 };
 
-// Admin Tabs
+// Admin Tabs with animated icons
 const AdminTabs: React.FC = () => (
   <Tab.Navigator
     initialRouteName="HomeDash"
@@ -88,7 +91,7 @@ const AdminTabs: React.FC = () => (
   </Tab.Navigator>
 );
 
-// User Tabs
+// User Tabs with animated icons
 const UserTabs: React.FC = () => (
   <Tab.Navigator
     initialRouteName="HomePage"
@@ -111,7 +114,7 @@ const UserTabs: React.FC = () => (
   </Tab.Navigator>
 );
 
-// Main App
+// Main App component
 const App: React.FC = () => {
   return (
     <PaperProvider>
