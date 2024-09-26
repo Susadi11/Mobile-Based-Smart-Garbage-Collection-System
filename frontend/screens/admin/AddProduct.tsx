@@ -100,9 +100,7 @@ const AddProduct = () => {
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.header}>
-                <Text style={styles.headerText}>Add Product Details</Text>
-            </View>
+              <Text style={styles.headerText}>Add Product Details</Text>
             <View style={styles.form}>
                 <View style={styles.formGroup}>
                     <Text style={styles.label}>Product Name</Text>
@@ -186,6 +184,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         fontWeight: 'bold',
+        paddingTop: 20,
     },
     form: {
         marginTop: 20,

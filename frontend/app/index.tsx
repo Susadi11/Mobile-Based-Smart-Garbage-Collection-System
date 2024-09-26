@@ -17,6 +17,7 @@ import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
 import AddProduct from '@/screens/admin/AddProduct';
 import PlaceOrder from '@/screens/user/PlaceOrder';
+import Invoice from '@/screens/user/Invoice'; 
 import UpdateProduct from '@/screens/admin/UpdateProduct';
  
 
@@ -126,8 +127,7 @@ const App: React.FC = () => {
             name="AllComplaints"
             component={AllComplaints}
           />
-            
-            <Stack.Screen
+          <Stack.Screen
             name="AddProduct"
             component={AddProduct}
           />
@@ -143,6 +143,11 @@ const App: React.FC = () => {
             <Stack.Screen
             name="UpdateProduct"
             component={UpdateProduct}
+          />
+          <Stack.Screen
+            name="Invoice"
+            component={Invoice}
+
           />
         </Stack.Navigator>
     </PaperProvider>
