@@ -1,143 +1,318 @@
-import React from 'react';
-import { View, Text, Image, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { LineChart, BarChart } from 'react-native-chart-kit';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+type RootStackParamList = {
+  Home: undefined;
+  BulkSchedules: undefined;
+  // Add other screens here
+};
 
 const HomeAd = () => {
+  const [activeDot, setActiveDot] = useState<number>(0);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const lineData = {
+    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+    datasets: [
+      {
+        data: [12, 19, 3, 5],
+        strokeWidth: 2,
+        color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
+      },
+    ],
+  };
+
+  const barData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+    datasets: [
+      {
+        data: [112, 10, 225, 134, 101, 80, 50, 100, 200],
+      },
+    ],
+  };
+
+  const goToDot = (index: number) => {
+    setActiveDot(index);
+  };
+
+  const nextDot = () => {
+    setActiveDot((prev) => (prev + 1) % 4);
+  };
+
+  const prevDot = () => {
+    setActiveDot((prev) => (prev - 1 + 4) % 4);
+  };
+
+  const renderChart = () => {
+    if (activeDot === 2) {
+      return (
+        <View style={styles.barChartContainer}>
+          <Text style={styles.barChartSubtitle}>Monthly Average</Text>
+          <BarChart
+            data={barData}
+            width={320}
+            height={220}
+            yAxisLabel="$"
+            yAxisSuffix=""
+            chartConfig={{
+              backgroundColor: '#ffffff',
+              backgroundGradientFrom: '#ffffff',
+              backgroundGradientTo: '#ffffff',
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(0, 123, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+              style: {
+                borderRadius: 16,
+              },
+              barPercentage: 0.5,
+            }}
+            style={{
+              marginVertical: 8,
+              borderRadius: 16,
+            }}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <LineChart
+          data={lineData}
+          width={320}
+          height={220}
+          chartConfig={{
+            backgroundColor: '#fff',
+            backgroundGradientFrom: '#fff',
+            backgroundGradientTo: '#fff',
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(255, 99, 132, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            style: {
+              borderRadius: 16,
+            },
+            propsForDots: {
+              r: "6",
+              strokeWidth: "2",
+              stroke: "#ffa726"
+            }
+          }}
+          bezier
+          style={{
+            marginVertical: 8,
+            borderRadius: 16,
+          }}
+        />
+      );
+    }
+  };
+
   return (
-    <>
-      {/* Header Section */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.balanceLabel}>Available Balance in</Text>
-        <TextInput style={styles.searchBar} placeholder="Search here" />
-      </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.pageTitle}>Dashboard</Text>
 
-      {/* Action Buttons */}
-      <View style={styles.actionsContainer}>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#7F58FE' }]}>
-          <Text style={styles.actionText}>Account Statement</Text>
-          <Text style={styles.subText}>Acc to Acc</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#FC9272' }]}>
-          <Text style={styles.actionText}>Fund Transfer</Text>
-          <Text style={styles.subText}>Acc to Acc</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#FF8B8B' }]}>
-          <Text style={styles.actionText}>Pay Bills</Text>
-          <Text style={styles.subText}>Acc to Biller</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#FF8B8B' }]}>
-          <Text style={styles.actionText}>Pay Bills</Text>
-          <Text style={styles.subText}>Acc to Biller</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Transaction List */}
-      <View style={styles.transactionList}>
-        <View style={styles.transactionHeader}>
-          <Text style={styles.transactionTitle}>Schedules</Text>
-          <Text style={styles.seeAll}>See All</Text>
-        </View>
-
-        {/* Transaction Items */}
-        <View style={styles.transactionItem}>
-          <View>
-            <Text style={styles.transactionName}>Restaurant</Text>
-            <Text style={styles.transactionLocation}>The Curtain, London</Text>
-          </View>
-          <Text style={styles.transactionAmount}>$35.00</Text>
-        </View>
-
+      {/* Card 1 with Chart */}
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>
+          {activeDot === 2 ? 'Product Sales' : 'Sales Overview'}
+        </Text>
         
+        {renderChart()}
+
+        {/* Navigation Dots and Arrows */}
+        <View style={styles.navigationContainer}>
+          <TouchableOpacity onPress={prevDot} style={styles.arrowButton}>
+            <Text style={styles.arrowText}>{'<'}</Text>
+          </TouchableOpacity>
+          <View style={styles.dotContainer}>
+            {Array(4).fill(null).map((_, index: number) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => goToDot(index)}
+                style={[
+                  styles.dot,
+                  { backgroundColor: activeDot === index ? '#007BFF' : '#ccc' },
+                ]}
+              />
+            ))}
+          </View>
+          <TouchableOpacity onPress={nextDot} style={styles.arrowButton}>
+            <Text style={styles.arrowText}>{'>'}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-    </>
+
+      <View style={styles.row}>
+        {/* Card 2 (Bulk Schedules) */}
+        <TouchableOpacity
+          style={[styles.card, styles.halfCard]}
+          onPress={() => navigation.navigate('BulkSchedules')}
+        >
+          <Text style={styles.title}>Bulk Schedules</Text>
+          <Text style={styles.description}>View all bulk schedules</Text>
+        </TouchableOpacity>
+
+        {/* Card 3 */}
+        <View style={[styles.card, styles.halfCard]}>
+          <Text style={styles.title}>Normal Schedules</Text>
+          <Text style={styles.description}>This is the description for Card 3.</Text>
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>Learn More</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+
+      {/* Card 4 */}
+      <View style={styles.card}>
+        <Image
+          source={{ uri: 'https://via.placeholder.com/150/FF33A1/FFFFFF?text=Card+4' }}
+          style={styles.image}
+        />
+        <Text style={styles.title}>Card Title 4</Text>
+        <Text style={styles.description}>This is the description for Card 4.</Text>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Learn More</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Card 5 */}
+      <View style={styles.card}>
+        <Image
+          source={{ uri: 'https://via.placeholder.com/150/FFD700/FFFFFF?text=Card+5' }}
+          style={styles.image}
+        />
+        <Text style={styles.title}>Card Title 5</Text>
+        <Text style={styles.description}>This is the description for Card 5.</Text>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Learn More</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Card 6 */}
+      <View style={styles.card}>
+        <Image
+          source={{ uri: 'https://via.placeholder.com/150/4B0082/FFFFFF?text=Card+6' }}
+          style={styles.image}
+        />
+        <Text style={styles.title}>Card Title 6</Text>
+        <Text style={styles.description}>This is the description for Card 6.</Text>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Learn More</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  headerContainer: {
-    marginBottom: 20,
-    paddingHorizontal: 20,
+  container: {
+    padding: 16,
+    flexGrow: 1,
   },
-  balanceLabel: {
-    fontSize: 16,
-    color: '#888',
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
   },
-  searchBar: {
+  card: {
     backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 10,
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    width: '100%',
+    marginBottom: 16,
+    padding: 16,
   },
-  actionsContainer: {
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  image: {
+    width: '100%',
+    height: 100,
+    borderRadius: 8,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 8,
+  },
+  description: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    borderRadius: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    marginTop: 12,
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  navigationContainer: {
     flexDirection: 'row',
-   
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
   },
-  actionButton: {
-    flex: 1,
-    height: 120,
-    borderRadius: 10,
+  dotContainer: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
+    marginHorizontal: 8,
+  },
+  dot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     marginHorizontal: 5,
-    padding: 10,
   },
-  actionText: {
-    fontSize: 18,
+  arrowButton: {
+    paddingHorizontal: 10,
+  },
+  arrowText: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
   },
-  subText: {
-    fontSize: 14,
-    color: '#fff',
-    marginTop: 5,
-    textAlign: 'center',
-  },
-  transactionList: {
+  barChartContainer: {
     marginTop: 20,
-    paddingHorizontal: 20,
   },
-  transactionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 15,
-  },
-  transactionTitle: {
+  barChartTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 4,
   },
-  seeAll: {
-    fontSize: 16,
-    color: '#FC9272',
-  },
-  transactionItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  transactionIcon: {
-    width: 40,
-    height: 40,
-    marginRight: 15,
-  },
-  transactionName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  transactionLocation: {
+  barChartSubtitle: {
     fontSize: 14,
-    color: '#888',
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 12,
   },
-  transactionAmount: {
-    marginLeft: 'auto',
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FC9272',
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // To ensure cards are spaced evenly
+    marginBottom: 16,
   },
+  halfCard: {
+    flex: 0.48, // Adjust this value to control the width of each card
+  },
+  
 });
 
 export default HomeAd;

@@ -25,6 +25,7 @@ import AddComplaint from '@/screens/user/AddComplaint';
 import ComplainRead from '@/screens/user/ComplainRead';
 import AllComplaints from '@/screens/admin/AllComplaints';
 import PendingComplaints from '@/screens/admin/PendingComplaints';
+import BulkSchedules from '@/components/Admin/Bulk/BulkSchedules';
 
 // Define stack and tab navigators
 const Stack = createNativeStackNavigator();
@@ -132,6 +133,7 @@ const App: React.FC = () => {
           <Stack.Screen name="UpdateProduct" component={UpdateProduct} />
           <Stack.Screen name="StorePage" component={StorePage} />
           <Stack.Screen name="PendingComplaints" component={PendingComplaints} />
+          <Stack.Screen name="BulkSchedules" component={BulkSchedules} />
         </Stack.Navigator>
     </PaperProvider>
   );
