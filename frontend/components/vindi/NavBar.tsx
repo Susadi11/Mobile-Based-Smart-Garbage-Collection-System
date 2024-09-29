@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
 const styles = StyleSheet.create({
   navbar: {
     flexDirection: 'row',
-    backgroundColor: '#00A36C', // Modern blue background
+    backgroundColor: '#4CAF50', // Modern blue background
     justifyContent: 'space-around', // Equal space between icons
     alignItems: 'center',
     paddingVertical: 7,

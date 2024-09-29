@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Modal, Button, TextInput } from "react-native";
-import { getDocs, collection } from "firebase/firestore"; // Firestore functions
-import { db } from "@/firebaseConfig"; // Adjust this import based on your Firebase setup
-import AdminNavBar from "@/components/vindi/AdminNavBar";
+import { getDocs, collection, doc, updateDoc } from "firebase/firestore"; // Firestore functions
+import { db } from "@/firebaseConfig";
 import Icon from "react-native-vector-icons/FontAwesome"; // Import FontAwesome icons
 
 interface Complaint {
@@ -44,15 +43,28 @@ const AllComplaints: React.FC = () => {
     fetchComplaints();
   }, []);
 
-  // Handle status change for each complaint
-  const handleStatusChange = (status: string) => {
+  // Handle status change and update Firestore
+  const handleStatusChange = async (status: string) => {
     if (selectedComplaint) {
-      setComplaints((prevComplaints) =>
-        prevComplaints.map((complaint) =>
-          complaint.complaintId === selectedComplaint.complaintId ? { ...complaint, status } : complaint
-        )
-      );
-      setSelectedComplaint({ ...selectedComplaint, status }); // Update the selected complaint's status
+      const complaintRef = doc(db, "complaints", selectedComplaint.complaintId); // Reference to the specific complaint
+      try {
+        // Update the status in Firestore
+        await updateDoc(complaintRef, {
+          status: status,
+        });
+
+        // Update the status locally
+        setComplaints((prevComplaints) =>
+          prevComplaints.map((complaint) =>
+            complaint.complaintId === selectedComplaint.complaintId
+              ? { ...complaint, status }
+              : complaint
+          )
+        );
+        setSelectedComplaint({ ...selectedComplaint, status });
+      } catch (error) {
+        console.error("Error updating status: ", error);
+      }
     }
   };
 
@@ -63,9 +75,13 @@ const AllComplaints: React.FC = () => {
   const renderComplaint = ({ item }: { item: Complaint }) => (
     <TouchableOpacity onPress={() => setSelectedComplaint(item)}>
       <View style={styles.card}>
-        <Text style={styles.title}>Complaint ID: {item.complaintId}</Text>
-        <Text style={styles.text}>Problem: {item.problem}</Text>
-        <Text style={styles.text1}>Status: {item.status}</Text>
+        {/* Add the icon here */}
+        <Icon name="book" size={13} color="#ff6347" style={styles.cardIcon} />
+        <View style={styles.cardContent}>
+          <Text style={styles.title}>Complaint ID: {item.complaintId}</Text>
+          <Text style={styles.text}>Problem: {item.problem}</Text>
+          <Text style={styles.statusText}>Status: {item.status}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -75,7 +91,6 @@ const AllComplaints: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Complaints</Text>
       </View>
-      <AdminNavBar />
 
       <View style={styles.complaintCountContainer}>
         <Icon name="list-alt" size={30} color="#4caf50" />
@@ -123,8 +138,8 @@ const AllComplaints: React.FC = () => {
                 <TouchableOpacity onPress={() => handleStatusChange("Pending")} style={styles.statusButton}>
                   <Text style={styles.statusButtonText}>Pending</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleStatusChange("Progressing")} style={styles.statusButton}>
-                  <Text style={styles.statusButtonText}>Progressing</Text>
+                <TouchableOpacity onPress={() => handleStatusChange("Processing")} style={styles.statusButton}>
+                  <Text style={styles.statusButtonText}>Processing</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => handleStatusChange("Resolved")} style={styles.statusButton}>
                   <Text style={styles.statusButtonText}>Resolved</Text>
@@ -154,8 +169,9 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   headerTitle: {
-    fontSize: 20,
-    color: "black",
+    fontSize: 25,
+    color: 'black',
+    fontWeight:'bold',
   },
   complaintCountContainer: {
     flexDirection: "row",
@@ -194,6 +210,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   card: {
+    flexDirection: "row", // Ensures the icon and text are side-by-side
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 15,
@@ -203,6 +220,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 3,
+  },
+  cardIcon: {
+    marginRight: 15,
+    
+  },
+  cardContent: {
+    flex: 1,
   },
   title: {
     fontSize: 18,
@@ -215,10 +239,8 @@ const styles = StyleSheet.create({
     color: "#666",
     marginBottom: 5,
   },
-  text1:{
-
-    color:'red',
-
+  statusText: {
+    color: "black",
   },
   modalOverlay: {
     flex: 1,
@@ -239,31 +261,28 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
   },
   modalText: {
     fontSize: 16,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   statusOptions: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     width: "100%",
-    marginVertical: 10,
+    marginTop: 20,
   },
   statusButton: {
-    flex: 1,
+    backgroundColor: "#4CAF50",
     padding: 10,
-    marginHorizontal: 5,
     borderRadius: 5,
-    backgroundColor: "#4caf50",
-    alignItems: "center",
   },
   statusButtonText: {
     color: "#fff",
-    fontSize: 12,
+    fontSize: 16,
   },
 });
 

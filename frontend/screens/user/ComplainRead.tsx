@@ -1,94 +1,204 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { doc, deleteDoc } from 'firebase/firestore'; // Import deleteDoc from Firestore
-import { db } from '@/firebaseConfig'; // Adjust the import based on your file structure
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, Alert, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { app } from '../../firebaseConfig'; // Ensure the path is correct based on your project structure
+import { RouteProp } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import Navbar from '@/components/vindi/NavBar';
-import { RouteProp, useRoute, useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
-  ComplainRead: {
-    complaintData: {
-      complaintId: string;
-      firstName: string;
-      lastName: string;
-      mobileNumber: string;
-      email: string;
-      location: string;
-      problem: string;
-    };
-  };
+  ComplainRead: { complaintId: string };
+  // other routes...
 };
 
 type ComplainReadRouteProp = RouteProp<RootStackParamList, 'ComplainRead'>;
-type ComplainReadNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ComplainRead'>;
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  mobileNumber: string;
+  email: string;
+  location: string;
+  problem: string;
+};
 
 const ComplainRead: React.FC = () => {
   const route = useRoute<ComplainReadRouteProp>();
-  const navigation = useNavigation<ComplainReadNavigationProp>();
-  const { complaintData } = route.params;
+  const navigation = useNavigation();
+  const { complaintId } = route.params;
+  const [complaintData, setComplaintData] = useState<FormData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [editable, setEditable] = useState(false);
+  const [formData, setFormData] = useState<FormData>({
+    firstName: '',
+    lastName: '',
+    mobileNumber: '',
+    email: '',
+    location: '',
+    problem: '',
+  });
 
-  // Handle Delete Function
+  const firestore = getFirestore(app);
+
+  useEffect(() => {
+    const fetchComplaint = async () => {
+      try {
+        const docRef = doc(firestore, 'complaints', complaintId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setComplaintData(docSnap.data() as FormData);
+          setFormData(docSnap.data() as FormData);
+        } else {
+          setError('No such complaint found!');
+        }
+      } catch (err) {
+        setError('Error fetching complaint data!');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchComplaint();
+  }, [complaintId, firestore]);
+
+  const handleUpdate = async () => {
+    try {
+      await updateDoc(doc(firestore, 'complaints', complaintId), formData);
+      Alert.alert('Success', 'Complaint updated successfully!');
+      setEditable(false);
+    } catch (err) {
+      console.error('Error updating document: ', err);
+      Alert.alert('Error', 'Failed to update complaint. Please try again.');
+    }
+  };
+
   const handleDelete = async () => {
-    // Show confirmation dialog
-    Alert.alert(
-      'Delete Complaint',
-      'Are you sure you want to delete this complaint?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'OK',
-          onPress: async () => {
-            try {
-              // Reference to the specific document in Firestore
-              const complaintDoc = doc(db, 'complaints', complaintData.complaintId);
-              // Delete the document
-              await deleteDoc(complaintDoc);
-              Alert.alert('Success', 'Complaint deleted successfully.');
-              navigation.goBack(); // Navigate back after deletion
-            } catch (error) {
-              Alert.alert('Error', 'Failed to delete the complaint.');
-              console.error("Error deleting complaint: ", error);
-            }
-          },
-        },
-      ],
-      { cancelable: false }
-    );
+    try {
+      await deleteDoc(doc(firestore, 'complaints', complaintId));
+      Alert.alert('Success', 'Complaint deleted successfully!');
+      navigation.goBack(); // Navigate back to the previous screen
+    } catch (err) {
+      console.error('Error deleting document: ', err);
+      Alert.alert('Error', 'Failed to delete complaint. Please try again.');
+    }
   };
 
-  const handleUpdate = () => {
-    Alert.alert('Update', 'Update feature is not yet implemented.');
+  const handleChange = (field: keyof FormData, value: string) => {
+    setFormData(prevData => ({ ...prevData, [field]: value }));
   };
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
+    Alert.alert('Error', error);
+    return null;
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Complaint Dashboard</Text>
       </View>
-      <Navbar />
-      <View style={styles.card}>
-        <Text style={styles.title}>Complaint Details</Text>
-        <Text style={styles.label}>Complaint ID: <Text style={styles.value}>{complaintData.complaintId}</Text></Text>
-        <Text style={styles.label}>First Name: <Text style={styles.value}>{complaintData.firstName}</Text></Text>
-        <Text style={styles.label}>Last Name: <Text style={styles.value}>{complaintData.lastName}</Text></Text>
-        <Text style={styles.label}>Mobile Number: <Text style={styles.value}>{complaintData.mobileNumber}</Text></Text>
-        <Text style={styles.label}>Email: <Text style={styles.value}>{complaintData.email}</Text></Text>
-        <Text style={styles.label}>Location: <Text style={styles.value}>{complaintData.location}</Text></Text>
-        <Text style={styles.label}>Problem: <Text style={styles.value}>{complaintData.problem}</Text></Text>
+      <Navbar/>
+      <ScrollView contentContainerStyle={styles.scrollViewContent}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Complaint Details</Text>
+          {complaintData && (
+            <>
+              {editable ? (
+                <>
+                  <Text style={styles.label}>Full Name:</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.firstName}
+                    onChangeText={(text) => handleChange('firstName', text)}
+                    placeholder="Enter first name"
+                  />
+                  <TextInput
+                    style={styles.input}
+                    value={formData.lastName}
+                    onChangeText={(text) => handleChange('lastName', text)}
+                    placeholder="Enter last name"
+                  />
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
-            <Text style={styles.buttonText}>Update</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-            <Text style={styles.buttonText}>Delete</Text>
-          </TouchableOpacity>
+                  <Text style={styles.label}>Mobile Number:</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.mobileNumber}
+                    onChangeText={(text) => handleChange('mobileNumber', text)}
+                    placeholder="Enter mobile number"
+                    keyboardType="phone-pad"
+                  />
+
+                  <Text style={styles.label}>Email:</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.email}
+                    onChangeText={(text) => handleChange('email', text)}
+                    placeholder="Enter email"
+                    keyboardType="email-address"
+                  />
+
+                  <Text style={styles.label}>Location:</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={formData.location}
+                    onChangeText={(text) => handleChange('location', text)}
+                    placeholder="Enter location"
+                  />
+
+                  <Text style={styles.label}>Problem:</Text>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    value={formData.problem}
+                    onChangeText={(text) => handleChange('problem', text)}
+                    placeholder="Describe problem"
+                    multiline
+                    numberOfLines={4}
+                  />
+
+                  <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+                    <Text style={styles.buttonText}>Update Complaint</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.button} onPress={() => setEditable(false)}>
+                    <Text style={styles.buttonText}>Cancel</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.label}>Full Name:</Text>
+                  <Text style={styles.info}>{complaintData.firstName} {complaintData.lastName}</Text>
+
+                  <Text style={styles.label}>Mobile Number:</Text>
+                  <Text style={styles.info}>{complaintData.mobileNumber}</Text>
+
+                  <Text style={styles.label}>Email:</Text>
+                  <Text style={styles.info}>{complaintData.email}</Text>
+
+                  <Text style={styles.label}>Location:</Text>
+                  <Text style={styles.info}>{complaintData.location}</Text>
+
+                  <Text style={styles.label}>Problem:</Text>
+                  <Text style={styles.info}>{complaintData.problem}</Text>
+
+                  <TouchableOpacity style={styles.button} onPress={() => setEditable(true)}>
+                    <Text style={styles.buttonText}>Edit Complaint</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+                    <Text style={styles.deleteButtonText}>Delete Complaint</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </>
+          )}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 };
@@ -96,7 +206,7 @@ const ComplainRead: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
+    backgroundColor: '#fff',
   },
   header: {
     width: '100%',
@@ -107,67 +217,69 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 25,
     color: 'black',
+    fontWeight:'bold',
+  },
+  scrollViewContent: {
+    padding: 16,
   },
   card: {
-    marginTop: 60,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 8,
+    padding: 40,
+    elevation: 1,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-    textAlign: 'center',
+    marginBottom: 16,
   },
   label: {
     fontSize: 16,
-    color: '#555',
+    fontWeight: 'bold',
     marginBottom: 8,
-    fontWeight: '600',
   },
-  value: {
-    fontWeight: 'normal',
-    color: '#333',
+  info: {
+    fontSize: 16,
+    marginBottom: 16,
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+  input: {
+    height: 40,
+    borderColor: '#e2e8f0',
+    borderWidth: 1,
+    borderRadius: 4,
+    backgroundColor: '#edf2f7',
+    marginBottom: 10,
+    paddingHorizontal: 10,
+    color: '#4a5568',
+  },
+  textArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  button: {
+    backgroundColor: '#4CAF50', // Blue color for update button
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 4,
+    alignItems: 'center',
     marginTop: 20,
   },
-  updateButton: {
-    backgroundColor: '#4caf50',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    alignItems: 'center',
-    shadowColor: '#4caf50',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 3,
-    elevation: 5,
-  },
   deleteButton: {
-    backgroundColor: '#f44336',
+    backgroundColor: '#e53e3e', // Red color for delete button
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
+    paddingHorizontal: 15,
+    borderRadius: 4,
     alignItems: 'center',
-    shadowColor: '#f44336',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.4,
-    shadowRadius: 3,
-    elevation: 5,
+    marginTop: 20,
   },
   buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  deleteButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',

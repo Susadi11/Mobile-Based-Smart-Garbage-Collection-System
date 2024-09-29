@@ -1,54 +1,88 @@
 import * as React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import AdminNavBar from '@/components/vindi/AdminNavBar';
+import { View, Text, StyleSheet,ScrollView} from 'react-native';
+import MapView from 'react-native-maps';  // Import MapView
+
 import CardGrid from '@/components/vindi/CardGrid';
 
 const ComplainDash: React.FC = () => {
   return (
-      <View style={styles.container}>
-         <View style={styles.header}>
+    <View style={styles.container}>
+      
+      <View style={styles.header}>
         <Text style={styles.headerTitle}>Complaint Dashboard</Text>
       </View>
-        <AdminNavBar/>
-        <Text style={styles.text2}>Summery of Complaints</Text>
-        <CardGrid/>
-        
-      </View>
+      
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+      
+      <CardGrid />
+
+      
+
+      {/* Placeholder for the map at the bottom */}
+      
+      <MapView
+        style={styles.map}
+        initialRegion={{
+          latitude: 37.78825,  // You can adjust this to any default location
+          longitude: -122.4324,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}
+      />
+      </ScrollView>
+    </View>
+    
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    title: {
-        marginTop: 30,
-        color: 'black',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 2,
-    },
-    header: {
-        width: '100%',
-        height: 60,
-        backgroundColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'center',
-        elevation: 4,
-        
-      },
-      text2:{
-        fontSize:20,
-        marginTop:30,
-        fontWeight: "bold",
-        marginLeft:20,
+  container: {
+    flex: 1,
+  },
+  title: {
+    marginTop: 30,
+    color: 'black',
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+  },
+  header: {
+    width: '100%',
+    height: 60,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 4,
 
-      },
-      headerTitle: {
-        fontSize: 20,
-        color: 'black',
-      },
+  },
+  text2: {
+    fontSize: 20,
+    marginTop: 10,
+    fontWeight: 'bold',
+    marginRight:150,
+    
+  },
+  headerTitle: {
+    fontSize: 25,
+    color: 'black',
+    fontWeight:'bold',
+
+
+  },
+  map: {
+    width: '90%',
+    height: 200,  // You can adjust the height as per your UI design
+    marginBottom:80,
+    
+
+  },
 });
 
 export default ComplainDash;
