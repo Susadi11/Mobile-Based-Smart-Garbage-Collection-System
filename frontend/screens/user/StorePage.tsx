@@ -27,20 +27,22 @@ const StorePage = ({ navigation }: any) => {
     
         const handlePlaceOrder = (product: any) => {
             // Navigate to PlaceOrder screen with product data as params
-            navigation.navigate('PlaceOrder', { product });
+            navigation.navigate('PlaceOrder', { 
+                formData: { unitPrice: product.unitPrice }, // Include totalPrice in formData
+                product,
+            });
         };
-
     const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
+        
     return (
         <ScrollView style={styles.container}>
           <ImageBackground
     source={{ uri: 'https://m.media-amazon.com/images/I/41san9tTmAL._AC_UF1000,1000_QL80_.jpg' }}   
 >
     <View style={styles.overlay}>
-        <Text style={styles.title}>Explore Products</Text>
+        <Text style={styles.title}>Organic Fertilizer</Text>
         <Text style={styles.title2}>Made for plant life 100% organic fertilizer</Text>
         <View style={styles.inputContainer}>
             <TextInput
@@ -65,7 +67,9 @@ const StorePage = ({ navigation }: any) => {
                             <Text style={styles.price}>Rs{item.unitPrice.toFixed(2)}</Text>
                         </View>
                         <Text style={styles.productDescription}>{item.description}</Text>
-                        <Text style={styles.productDescription}>Composition:  {item.composition}</Text>
+                        <Text style={styles.productDescription}>
+                            <Text style={{ fontWeight: 'bold' }}>Composition:</Text> {item.composition}
+                        </Text> 
                         <Text style={styles.productDescription}>{item.benifits}</Text>
                         <TouchableOpacity style={styles.orderButton} onPress={() => handlePlaceOrder(item)}>
                             <Icon name="shopping-cart" size={20} color="#fff" />

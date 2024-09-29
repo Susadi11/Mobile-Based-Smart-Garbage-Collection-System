@@ -1,27 +1,93 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
+import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../../firebaseConfig'; // Import your Firebase configuration
+
+type FormData = {
+    name: string;
+    phone: string;
+    email: string;
+    amount: string;
+    date: string;
+    time: string;
+    urbanCouncil: string;
+    area: string;
+    city: string;
+    state: string;
+    postCode: string;
+};
+
+type RootStackParamList = {
+    PlaceOrder: undefined;
+    Invoice: { formData: FormData; invoiceNumber: string; totalPrice: number };
+};
+
+type PlaceOrderScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PlaceOrder'>;
 
 const PlaceOrder = () => {
-    const [formData, setFormData] = useState({
+    const navigation = useNavigation<PlaceOrderScreenNavigationProp>();
+    const [formData, setFormData] = useState<FormData>({
         name: '',
         phone: '',
         email: '',
+        amount: '',
         date: '',
         time: '',
+        urbanCouncil: '',
         area: '',
         city: '',
         state: '',
         postCode: ''
     });
+    const [selectedAmount, setSelectedAmount] = useState<string | null>(null);
+    const [selectedCouncil, setSelectedCouncil] = useState<string | null>(null);
+    const unitPrice = 10; // Example unit price
 
-    const handleChange = (name: string, value: string) => {
+    const handleChange = (name: keyof FormData, value: string) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = () => {
-        // Handle form submission logic here
-        alert('Appointment Booked');
+    const generateInvoiceNumber = () => {
+        return `INV-${Math.floor(Math.random() * 1000000)}`; // Generate random invoice number
     };
+
+    const handleSubmit = async () => {
+        if (!selectedAmount || !selectedCouncil) {
+            Alert.alert("Error", "Please fill in all required fields.");
+            return;
+        }
+
+        const totalPrice = Number(unitPrice) * parseFloat(selectedAmount || '0');
+        const invoiceNumber = generateInvoiceNumber();
+
+        const orderData = {
+            ...formData,
+            amount: selectedAmount,
+            urbanCouncil: selectedCouncil,
+            totalPrice,
+            invoiceNumber,
+            createdAt: new Date().toISOString(),
+        };
+
+        try {
+            // Store the order in Firebase
+            await addDoc(collection(db, 'orders'), orderData);
+
+            // Navigate to the Invoice page
+            navigation.navigate('Invoice', {
+                formData: orderData,
+                invoiceNumber,
+                totalPrice,
+            });
+        } catch (error) {
+            console.error('Error saving order: ', error);
+            Alert.alert('Error', 'Failed to place the order. Please try again.');
+        }
+    };
+    
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -33,23 +99,42 @@ const PlaceOrder = () => {
                     value={formData.name}
                     onChangeText={(text) => handleChange('name', text)}
                 />
-                
+
                 <Text style={styles.label}>Phone Number</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="Enter your phone number"
                     value={formData.phone}
                     onChangeText={(text) => handleChange('phone', text)}
+                    keyboardType="numeric"
+                    maxLength={10}
                 />
-                
+
                 <Text style={styles.label}>Email Address</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="Enter your email"
                     value={formData.email}
                     onChangeText={(text) => handleChange('email', text)}
+                    keyboardType="email-address"
+                    onBlur={() => {
+                        if (!formData.email.includes('@')) {
+                            Alert.alert('Please enter a valid email address');
+                        }
+                    }}
                 />
+
+                <Text style={styles.label}>Amount</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="Enter Quantity"
+                    value={formData.amount}
+                    onChangeText={(text) => handleChange('amount', text)}
+                    keyboardType="numeric"
+                    maxLength={3}
                 
+                />
+
                 <View style={styles.row}>
                     <View style={styles.inputWrapper}>
                         <Text style={styles.label}>Date</Text>
@@ -74,9 +159,32 @@ const PlaceOrder = () => {
                         />
                     </View>
                 </View>
-                
+
+                <Text style={styles.label}>Urban Council</Text>
+                <RNPickerSelect
+                    onValueChange={(value) => setSelectedCouncil(value)}
+                    items={[
+                        { label: 'Colombo Municipal Council', value: 'Colombo Municipal Council' },
+                        { label: 'Kandy Municipal Council', value: 'Kandy Municipal Council' },
+                        { label: 'Galle Municipal Council', value: 'Galle Municipal Council' },
+                        { label: 'Matara Municipal Council', value: 'Matara Municipal Council' },
+                        { label: 'Negombo Municipal Council', value: 'Negombo Municipal Council' },
+                        { label: 'Jaffna Municipal Council', value: 'Jaffna Municipal Council' },
+                        { label: 'Dehiwala-Mount Lavinia Municipal Council', value: 'Dehiwala-Mount Lavinia Municipal Council' },
+                        { label: 'Moratuwa Municipal Council', value: 'Moratuwa Municipal Council' },
+                        { label: 'Kurunegala Municipal Council', value: 'Kurunegala Municipal Council' },
+                        { label: 'Ratnapura Municipal Council', value: 'Ratnapura Municipal Council' },
+                        { label: 'Badulla Municipal Council', value: 'Badulla Municipal Council' },
+                                    ]}
+                    placeholder={{ label: 'Order picking urban council...', value: null }}
+                    style={{
+                        inputIOS: styles.input,
+                        inputAndroid: styles.input,
+                    }}
+                />
+
                 <Text style={styles.subLabel}>Address Details</Text>
-                
+
                 <View style={styles.row}>
                     <View style={styles.inputWrapper}>
                         <TextInput
@@ -95,7 +203,7 @@ const PlaceOrder = () => {
                         />
                     </View>
                 </View>
-                
+
                 <View style={styles.row}>
                     <View style={styles.inputWrapper}>
                         <TextInput
@@ -115,7 +223,11 @@ const PlaceOrder = () => {
                     </View>
                 </View>
 
-                <Button title="Confirm Order" onPress={handleSubmit} color="#6A64F1" />
+                <Button
+                    title="Confirm Order"
+                    onPress={handleSubmit}
+                    color="#6A64F1"
+                />
             </View>
         </ScrollView>
     );
@@ -132,39 +244,34 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         padding: 20,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
-    },
-    label: {
-        fontSize: 16,
-        fontWeight: '600',
-        color: '#07074D',
-        marginBottom: 8,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 8,
+        elevation: 2,
     },
     input: {
-        height: 40,
-        borderColor: '#e0e0e0',
         borderWidth: 1,
-        borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 16,
-        backgroundColor: '#fff',
+        borderColor: '#ccc',
+        borderRadius: 8,
+        padding: 10,
+        marginBottom: 15,
+    },
+    label: {
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    subLabel: {
+        fontSize: 16,
+        marginTop: 10,
+        marginBottom: 10,
     },
     row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom: 16,
     },
     inputWrapper: {
         flex: 1,
         marginHorizontal: 5,
-    },
-    subLabel: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#07074D',
-        marginBottom: 16,
     },
 });
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, ScrollView, Alert } from 'react-native';
 import { View, Text, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native';
 import { getFirestore, collection, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
+
 import { app } from '../../firebaseConfig';
 
 interface Product {
@@ -83,6 +84,7 @@ const StoreDash = ({ navigation }: any) => {
     // Filter products based on search query
     const filteredProducts = products.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        
     );
 
     return (
@@ -116,8 +118,12 @@ const StoreDash = ({ navigation }: any) => {
                                 <Text style={styles.productName}>{product.name}</Text>
                                 <Text style={styles.productPrice}>Price: Rs {product.unitPrice}</Text>
                                 <Text style={styles.productDescription}>{product.description}</Text>
-                                <Text style={styles.productComposition}>Composition: {product.composition}</Text>
-                                <Text style={styles.productBenefits}>Benefits: {product.benefits}</Text>
+                                <Text style={styles.productComposition}>
+                                    <Text style={{ fontWeight: 'bold' }}>Composition:</Text> {product.composition}
+                                </Text>
+                                <Text style={styles.productBenefits}>
+                                    <Text style={{ fontWeight: 'bold' }}>Benefits:</Text> {product.benefits}
+                                </Text>
                                 <View style={styles.actionButtons}>
                                 <TouchableOpacity 
                                         style={styles.updateButton}
@@ -154,6 +160,7 @@ const styles = StyleSheet.create({
     },
     scrollContainer: {
         paddingHorizontal: 0,
+        paddingVertical: 0,
     },
     overlay: {
         flex: 1,
@@ -219,13 +226,13 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     productPrice: {
-        fontSize: 16,
+        fontSize: 20,
         color: '#4CAF50',
         marginTop: 5,
     },
     productDescription: {
         fontSize: 14,
-        color: '#666',
+        color: '#261d78',
         marginTop: 5,
     },
     productComposition: {

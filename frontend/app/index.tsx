@@ -20,6 +20,7 @@ import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
 import AddProduct from '@/screens/admin/AddProduct';
 import PlaceOrder from '@/screens/user/PlaceOrder';
+import Invoice from '@/screens/user/Invoice'; 
 import UpdateProduct from '@/screens/admin/UpdateProduct';
 import AddComplaint from '@/screens/user/AddComplaint';
 import ComplainRead from '@/screens/user/ComplainRead';
@@ -120,20 +121,58 @@ const App: React.FC = () => {
   return (
     <PaperProvider>
         <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Welcome" component={WelcomePage} />
-          <Stack.Screen name="AdminTabs" component={AdminTabs} />
-          <Stack.Screen name="UserTabs" component={UserTabs} />
-          <Stack.Screen name="AddBulkPage" component={AddBulkPage} />
-          <Stack.Screen name="AddComplaint" component={AddComplaint} />
-          <Stack.Screen name="ComplainRead" component={ComplainRead} />
-          <Stack.Screen name="AllComplaints" component={AllComplaints} />
-          <Stack.Screen name="AddProduct" component={AddProduct} />
-          <Stack.Screen name="PlaceOrder" component={PlaceOrder} />
-          <Stack.Screen name="StoreDash" component={StoreDash} />
-          <Stack.Screen name="UpdateProduct" component={UpdateProduct} />
-          <Stack.Screen name="StorePage" component={StorePage} />
-          <Stack.Screen name="PendingComplaints" component={PendingComplaints} />
-          <Stack.Screen name="BulkSchedules" component={BulkSchedules} />
+          <Stack.Screen
+            name="Welcome"
+            component={WelcomePage}
+          />
+          <Stack.Screen
+            name="AdminTabs"
+            component={AdminTabs}
+          />
+          <Stack.Screen
+            name="UserTabs"
+            component={UserTabs}
+          />
+          <Stack.Screen
+            name="AddBulkPage"
+            component={AddBulkPage}
+          />
+           <Stack.Screen
+
+            name="AddComplaint"
+            component={AddComplaint}
+          />
+           <Stack.Screen
+            name="ComplainRead"
+            component={ComplainRead}
+          />
+          <Stack.Screen
+            name="AllComplaints"
+            component={AllComplaints}
+          />
+          <Stack.Screen
+            name="AddProduct"
+            component={AddProduct}
+          />
+          <Stack.Screen
+            name="PlaceOrder"
+            component={PlaceOrder}
+
+          />
+            <Stack.Screen
+            name="StoreDash"
+            component={StoreDash}
+          />
+            <Stack.Screen
+            name="UpdateProduct"
+            component={UpdateProduct}
+          />
+          <Stack.Screen
+            name="Invoice"
+            component={Invoice}
+
+          />
+ 
         </Stack.Navigator>
     </PaperProvider>
   );
