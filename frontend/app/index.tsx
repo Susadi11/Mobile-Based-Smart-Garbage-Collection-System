@@ -167,6 +167,8 @@ const App: React.FC = () => {
             name="UpdateProduct"
             component={UpdateProduct}
           />
+          <Stack.Screen name="BulkSchedules" component={BulkSchedules} />
+          
           <Stack.Screen
             name="Invoice"
             component={Invoice}
