@@ -132,7 +132,7 @@ const BulkSchedules = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 10,
     flex: 1,
   },
   loadingContainer: {
