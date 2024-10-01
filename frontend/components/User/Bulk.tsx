@@ -85,8 +85,21 @@ const Bulk: React.FC<BulkProps> = ({ existingTransaction, onAddComplete, onUpdat
   };
 
   const handleSubmit = async () => {
+    // Pickup date validation: Ensure it is a future date
+    if (pickupDate < new Date()) {
+      Alert.alert('Error', 'Pickup date must be in the future.');
+      return;
+    }
+  
+    // Weight validation: Ensure it is a positive number if required
+    if (scheduleType === 'bulk' && (weight === null || isNaN(Number(weight)) || Number(weight) <= 0)) {
+      Alert.alert('Error', 'Please enter a valid positive weight.');
+      return;
+    }
+  
+    // Validation for required fields
     if (!name || !scheduleType || garbageTypes.length === 0) {
-      Alert.alert('Error', 'Please fill in all required fields');
+      Alert.alert('Error', 'Please fill in all required fields.');
       return;
     }
   
@@ -120,7 +133,7 @@ const Bulk: React.FC<BulkProps> = ({ existingTransaction, onAddComplete, onUpdat
         Alert.alert('An unknown error occurred');
       }
     }
-  };
+  };  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

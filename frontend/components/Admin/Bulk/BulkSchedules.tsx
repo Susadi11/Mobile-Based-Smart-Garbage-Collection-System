@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, Platform } from 'react-native';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { app } from '../../../firebaseConfig'; // Adjust the path to your firebase config
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
-// Remove the import for react-native-html-to-pdf
-// import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system';
 
 interface Schedule {
   id: string;
@@ -44,11 +43,14 @@ const BulkSchedules = () => {
     fetchSchedules();
   }, []);
 
-  // Updated function to handle report generation
   const generateReport = async () => {
     let schedulesReport = `
-      <h1 style="text-align: center; color: #10b981;">Bulk Schedules Report</h1>
-      <div style="margin: 20px; font-family: Arial, sans-serif;">
+      <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+        </head>
+        <body style="font-family: 'Helvetica'; padding: 20px;">
+          <h1 style="text-align: center; color: #10b981;">Bulk Schedules Report</h1>
     `;
   
     schedules.forEach((schedule) => {
@@ -64,17 +66,29 @@ const BulkSchedules = () => {
       `;
     });
   
-    schedulesReport += `</div>`;
-  
-    const pdfOptions = {
-      html: schedulesReport,
-      fileName: 'Bulk_Schedules_Report',
-      directory: 'Documents',
-    };
+    schedulesReport += `
+        </body>
+      </html>
+    `;
   
     try {
-      const file = await RNHTMLtoPDF.convert(pdfOptions);
-      Alert.alert('PDF Generated', `PDF report has been generated at: ${file.filePath}`);
+      const { uri } = await Print.printToFileAsync({ html: schedulesReport });
+      const fileName = 'BulkSchedulesReport.pdf';
+      const destination = `${FileSystem.cacheDirectory}${fileName}`;
+
+      await FileSystem.moveAsync({
+        from: uri,
+        to: destination,
+      });
+
+      Alert.alert(
+        'Report Generated',
+        `Report has been saved to: ${destination}`,
+        [
+          { text: 'OK' },
+        ],
+        { cancelable: false }
+      );
     } catch (error) {
       console.error('Error generating PDF:', error);
       Alert.alert('Error', 'Failed to generate PDF. Please try again.');
@@ -94,7 +108,6 @@ const BulkSchedules = () => {
     <View style={styles.container}>
       <Text style={styles.pageTitle}>Bulk Schedules</Text>
 
-      {/* Button to generate report */}
       <TouchableOpacity style={styles.button} onPress={generateReport}>
         <Text style={styles.buttonText}>Generate Report</Text>
       </TouchableOpacity>
