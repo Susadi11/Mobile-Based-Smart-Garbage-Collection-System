@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, Platform } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { getFirestore, collection, onSnapshot } from 'firebase/firestore';
@@ -18,6 +18,7 @@ interface WasteSchedule {
 const Map: React.FC = () => {
     const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const [wasteSchedules, setWasteSchedules] = useState<WasteSchedule[]>([]);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     const firestore = getFirestore(app);
 
@@ -25,7 +26,7 @@ const Map: React.FC = () => {
         const requestLocationPermission = async () => {
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                console.log('Location permission denied');
+                setErrorMsg('Location permission denied');
                 return;
             }
             getCurrentLocation();
@@ -54,6 +55,7 @@ const Map: React.FC = () => {
                 longitude: coords.longitude,
             });
         } catch (error) {
+            setErrorMsg('Error fetching location');
             console.warn(error);
         }
     };
@@ -248,10 +250,18 @@ const Map: React.FC = () => {
         }
     ];
 
+    if (errorMsg) {
+        return (
+            <View style={styles.container}>
+                <Text>{errorMsg}</Text>
+            </View>
+        );
+    }
+
     return (
         <View style={styles.container}>
             <MapView
-                provider={PROVIDER_GOOGLE}
+                provider={Platform.OS === 'ios' ? undefined : PROVIDER_GOOGLE}
                 customMapStyle={mapStyle}
                 style={styles.map}
                 initialRegion={{
@@ -276,6 +286,7 @@ const Map: React.FC = () => {
         </View>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
