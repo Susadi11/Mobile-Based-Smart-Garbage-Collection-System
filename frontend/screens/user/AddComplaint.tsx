@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { View,Text,TouchableOpacity,StyleSheet, ScrollView} from 'react-native';
 import Form from '@/components/vindi/Form';
-import Navbar from '@/components/vindi/NavBar';
+import Navbar from '@/components/vindi/ListNavBar';
+import ListNavbar from '@/components/vindi/ListNavBar';
 
 const AddComplaint: React.FC =() => {
 
@@ -11,10 +12,10 @@ const AddComplaint: React.FC =() => {
         
         <View style={styles.container}>
         <View style={styles.header}>
-        <Text style={styles.headerTitle}>Complaint Dashboard</Text>
+        <Text style={styles.headerTitle}>Add Complaint</Text>
       </View>
 
-          <Navbar/>
+          <ListNavbar/>
             
                 <Form/>
             

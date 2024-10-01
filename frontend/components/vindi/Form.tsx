@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import MapView, { Marker } from 'react-native-maps'; // Import MapView and Marker
+import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { app } from '../../firebaseConfig'; // Ensure the path is correct based on your project structure
@@ -19,35 +21,49 @@ const Form: React.FC = () => {
   const [lastName, setLastName] = useState('');
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
-  const [location, setLocation] = useState('');
   const [problem, setProblem] = useState('');
+  const [location, setLocation] = useState<{ latitude: number, longitude: number }>({ latitude: 6.9271, longitude: 79.8612 }); // Default to Colombo
+  const [region, setRegion] = useState({
+    latitude: 6.9271,
+    longitude: 79.8612,
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  });
+  const [date, setDate] = useState(''); // State to store date
+  const [time, setTime] = useState(''); // State to store time
 
   const firestore = getFirestore(app);
 
-  const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  useEffect(() => {
+    const currentDate = new Date();
+    setDate(currentDate.toLocaleDateString()); // Format date as needed
+    setTime(currentDate.toLocaleTimeString()); // Format time as needed
 
-  const validateMobile = (mobile: string) => {
-    const mobileRegex = /^[0-9]{10}$/; // Adjust the regex based on the country format
-    return mobileRegex.test(mobile);
+    // Request location permission
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'Location permission is needed to select your location.');
+        return;
+      }
+
+      let userLocation = await Location.getCurrentPositionAsync({});
+      setRegion({
+        ...region,
+        latitude: userLocation.coords.latitude,
+        longitude: userLocation.coords.longitude,
+      });
+    })();
+  }, []);
+
+  const handleLocationSelect = (coordinate: { latitude: number, longitude: number }) => {
+    setLocation(coordinate);
   };
 
   const handleSubmit = async () => {
     // Basic form validation
     if (!firstName || !lastName || !mobileNumber || !email || !location || !problem) {
       Alert.alert('Error', 'Please fill in all fields.');
-      return;
-    }
-
-    if (!validateMobile(mobileNumber)) {
-      Alert.alert('Error', 'Please enter a valid mobile number.');
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      Alert.alert('Error', 'Please enter a valid email address.');
       return;
     }
 
@@ -58,6 +74,8 @@ const Form: React.FC = () => {
       email,
       location,
       problem,
+      date, // Include the date
+      time, // Include the time
     };
 
     try {
@@ -65,10 +83,7 @@ const Form: React.FC = () => {
       const docRef = await addDoc(collection(firestore, 'complaints'), formData);
       const complaintId = docRef.id; // Get the document ID
 
-      console.log('Document written with ID: ', complaintId);
       Alert.alert('Success', 'Complaint submitted successfully!');
-
-      // Navigate to ComplainRead page with the complaint ID
       navigation.navigate('ComplainRead', { complaintId });
 
       // Reset form fields
@@ -76,76 +91,89 @@ const Form: React.FC = () => {
       setLastName('');
       setMobileNumber('');
       setEmail('');
-      setLocation('');
       setProblem('');
     } catch (error) {
-      console.error('Error adding document: ', error);
-      Alert.alert('Error', 'Failed to submit complaint. Please try again.');
+      Alert.alert('Error', 'Failed to submit complaint.');
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.form}>
-        <Text style={styles.title}>Complaint Form</Text>
-
-        <Text style={styles.label}>Full Name</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your first name"
-          value={firstName}
-          onChangeText={setFirstName}
-        />
-
-        <Text style={styles.label}>Last Name</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your last name"
-          value={lastName}
-          onChangeText={setLastName}
-        />
-
-        <Text style={styles.label}>Mobile Number</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your mobile number"
-          value={mobileNumber}
-          keyboardType="phone-pad"
-          onChangeText={setMobileNumber}
-        />
-
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your email"
-          value={email}
-          keyboardType="email-address"
-          onChangeText={setEmail}
-        />
-
-        <Text style={styles.label}>Location</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your location"
-          value={location}
-          onChangeText={setLocation}
-        />
-
-        <Text style={styles.label}>Problem</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Describe your problem"
-          value={problem}
-          multiline
-          numberOfLines={4}
-          onChangeText={setProblem}
-        />
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Submit</Text>
-          </TouchableOpacity>
+        <View style={styles.inputGroup}>
+          
+          {/* Display Current Date and Time */}
+        <Text style={styles.dateTimeText}>Current Date: {date}</Text>
+        <Text style={styles.dateTimeText}>Current Time: {time}</Text>
+          <Text style={styles.label}>First Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="John"
+            value={firstName}
+            onChangeText={setFirstName}
+          />
         </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Last Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Doe"
+            value={lastName}
+            onChangeText={setLastName}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Mobile Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="0771234567"
+            value={mobileNumber}
+            keyboardType="phone-pad"
+            onChangeText={setMobileNumber}
+          />
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="example@mail.com"
+            value={email}
+            keyboardType="email-address"
+            onChangeText={setEmail}
+          />
+        </View>
+
+        {/* Map View */}
+        <View style={styles.mapContainer}>
+          <Text style={styles.label}>Select Your Location</Text>
+          <MapView
+            style={styles.map}
+            region={region}
+            onPress={(e) => handleLocationSelect(e.nativeEvent.coordinate)}
+          >
+            <Marker coordinate={location} title="Selected Location" />
+          </MapView>
+        </View>
+
+        <View style={styles.inputGroup}>
+          <Text style={styles.label}>Describe Your Problem</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Explain the issue"
+            value={problem}
+            multiline
+            numberOfLines={4}
+            onChangeText={setProblem}
+          />
+        </View>
+
+       
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Submit Complaint</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -157,66 +185,73 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 16,
+    backgroundColor: 'white',
   },
   form: {
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 450,
     backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 5,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 20,
   },
-  title: {
-    color: '#4a5568',
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
+  inputGroup: {
+    marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 16,
+    fontWeight: '600',
     color: '#4a5568',
-    fontWeight: 'bold',
     marginBottom: 5,
+    marginTop:5,
   },
+  
   input: {
-    height: 40,
-    borderColor: '#e2e8f0',
+    height: 50,
+    borderColor: '#cbd5e0',
     borderWidth: 1,
-    borderRadius: 4,
+    borderRadius: 12,
     backgroundColor: '#edf2f7',
-    marginBottom: 10,
-    paddingHorizontal: 10,
-    color: '#4a5568',
+    paddingHorizontal: 15,
+    fontSize: 16,
   },
   textArea: {
-    height: 80,
+    height: 100,
     textAlignVertical: 'top',
   },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
+  mapContainer: {
+    height: 300,
+    marginBottom: 20,
+  },
+  map: {
+    flex: 1,
+  },
+  dateTimeText: {
+    fontSize: 16,
+    marginVertical: 5,
+    color: '#4a5568',
+    fontWeight:'bold',
+    marginBottom:10,
   },
   button: {
-    backgroundColor: '#3182ce',
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 4,
+    backgroundColor: '#4CAF50',
+    paddingVertical: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: 'bold',
   },
+  
+  
 });
 
 export default Form;

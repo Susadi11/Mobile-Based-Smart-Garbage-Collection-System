@@ -10,8 +10,13 @@ interface Complaint {
   lastName: string;
   mobileNumber: string;
   email: string;
-  location: string;
+  location: {
+    latitude: number; // Define latitude as a number
+    longitude: number; // Define longitude as a number
+  };
   problem: string;
+  date: string; // Add date field
+  time: string; // Add time field
   status: string; // Field for complaint status
 }
 
@@ -130,7 +135,15 @@ const AllComplaints: React.FC = () => {
               <Text style={styles.modalText}>Last Name: {selectedComplaint.lastName}</Text>
               <Text style={styles.modalText}>Mobile Number: {selectedComplaint.mobileNumber}</Text>
               <Text style={styles.modalText}>Email: {selectedComplaint.email}</Text>
-              <Text style={styles.modalText}>Location: {selectedComplaint.location}</Text>
+
+              {/* Format and display location */}
+              <Text style={styles.modalText}>
+                Location: Latitude: {selectedComplaint.location.latitude}, Longitude: {selectedComplaint.location.longitude}
+              </Text>
+
+              {/* Format and display date and time */}
+              <Text style={styles.modalText}>Date: {new Date(selectedComplaint.date).toLocaleDateString()}</Text>
+              <Text style={styles.modalText}>Time: {selectedComplaint.time}</Text>
               <Text style={styles.modalText}>Problem: {selectedComplaint.problem}</Text>
               <Text style={styles.modalText}>Status: {selectedComplaint.status}</Text>
 
@@ -249,36 +262,40 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.5)",
   },
   modalContent: {
-    width: "80%",
+    width: "90%",
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
-    alignItems: "center",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
     shadowRadius: 10,
-    elevation: 3,
+    elevation: 5,
+   
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 30,
     fontWeight: "bold",
     marginBottom: 10,
+   
   },
   modalText: {
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 10,
+    fontWeight:'bold',
+    
   },
   statusOptions: {
     flexDirection: "row",
     justifyContent: "space-around",
-    width: "100%",
-    marginTop: 20,
+    marginVertical: 10,
   },
   statusButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    backgroundColor: "#4caf50",
     borderRadius: 5,
+    width:88,
   },
   statusButtonText: {
     color: "#fff",
