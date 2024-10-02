@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#d1d5db', // Tailwind border-gray-300
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 30,
     paddingLeft: 10,
     backgroundColor: '#ffffff', // Tailwind bg-white
   },
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     borderColor: '#4CAF50', // Tailwind border-green-500
     backgroundColor: '#ffffff', // Tailwind bg-white
     marginBottom: 8,
-    borderRadius: 8,
+    borderRadius: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
