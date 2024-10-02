@@ -19,9 +19,6 @@
         "NSLocationAlwaysUsageDescription": "This app needs access to location when in the background for navigation purposes.",
         "NSCameraUsageDescription": "This app needs access to the camera to take photos.",
         "NSPhotoLibraryUsageDescription": "This app needs access to the photo library to select photos."
-      },
-      "config": {
-        "googleMapsApiKey": "YOUR_IOS_GOOGLE_MAPS_API_KEY_HERE"
       }
     },
     "android": {
@@ -35,12 +32,7 @@
         "WRITE_EXTERNAL_STORAGE",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION"
-      ],
-      "config": {
-        "googleMaps": {
-          "apiKey": "YOUR_ANDROID_GOOGLE_MAPS_API_KEY_HERE"
-        }
-      }
+      ]
     },
     "web": {
       "bundler": "metro",
