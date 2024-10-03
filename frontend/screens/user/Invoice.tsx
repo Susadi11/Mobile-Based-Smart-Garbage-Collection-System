@@ -1,7 +1,8 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet } from 'react-native';
-import { Card, Title, Paragraph } from 'react-native-paper'; // Importing components from react-native-paper
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
+import RNHTMLtoPDF from 'react-native-html-to-pdf'; // Import the library
+import { MaterialIcons } from '@expo/vector-icons'; // Import icons
 
 
 type RouteParams = {
@@ -21,56 +22,93 @@ type RouteParams = {
 };
 
 const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
+ 
     const { formData, invoiceNumber, totalPrice } = route.params; // Retrieve data passed via navigation
+ 
 
+    // Function to generate and download PDF
+    const downloadInvoice = async () => {
+        const html = `
+            <h1>Order Invoice</h1>
+            <h3>Invoice #: ${invoiceNumber}</h3>
+            <p>Date: ${formData.date}</p>
+            <p>Time: ${formData.time}</p>
+            <h2>Bill To:</h2>
+            <p>Name: ${formData.name}</p>
+            <p>Phone: ${formData.phone}</p>
+            <p>Pickup Location: ${formData.urbanCouncil}</p>
+            <p>Email: ${formData.email}</p>
+            <h3>Product Order: ${formData.amount}</h3>
+            <h3>Total Amount: Rs ${totalPrice.toFixed(2)}</h3>
+            <p>Thank you for your business!</p>
+            <p>Please Collect Your Order from your Selected Urban Council.</p>
+        `;
+
+        try {
+            const options = {
+                html,
+                fileName: `Invoice_${invoiceNumber}`,
+                directory: 'Documents',
+            };
+            const file = await RNHTMLtoPDF.convert(options);
+            Alert.alert('Success', `PDF saved to: ${file.filePath}`);
+        } catch (error) {
+            Alert.alert('Error', 'Failed to create PDF');
+            console.error(error);
+        }
+    };
+ 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.invoiceContainer}>
-            <Text style={styles.headerText}>Order Invoice </Text>
-            <View style={styles.divider} />
-            <View style={styles.invoiceHeader}>
-              <Text style={styles.titleText}>Pickup Details</Text>
-              <View>
-                <Text style={styles.infoText}>Date: {formData.date}</Text>
-                <Text style={styles.infoText}>Time: {formData.time}</Text>
-                <Text style={styles.infoText}>Invoice #: {invoiceNumber}</Text>
-              </View>
-            </View>
-    
-            <View style={styles.billToSection}>
-              <Text style={styles.subTitleText}>Bill To:</Text>
-              <Text style={styles.text}>Nmae:{formData.name}</Text>
-              <Text style={styles.text}>Phone: {formData.phone}</Text>
-              <Text style={styles.text}>Pickup Location:{formData.urbanCouncil}</Text>
-              <Text style={styles.text}>Email:{formData.email}</Text>
-            </View>
-    
-            <View style={styles.table}>
-              <View style={styles.tableHeader}>
-                <Text style={styles.tableHeaderText}>Description</Text>
-                <Text style={styles.tableHeaderTextRight}>Quantity</Text>
-              </View>
-    
-              <View style={styles.tableRow}>
-                <Text style={styles.text}>Product Order</Text>
-                <Text style={styles.textRight}>{formData.amount}</Text>
-              </View>
-    
-              <View style={styles.tableFooter}>
-                <Text style={styles.footerText}>Total Amount</Text>
-                <Text style={styles.footerTextRight}>Rs {totalPrice.toFixed(2)}</Text>
-              </View>
-            </View>
+            <View style={styles.invoiceContainer}>
+                <Text style={styles.headerText}>Order Invoice</Text>
+                <View style={styles.divider} />
+                <View style={styles.invoiceHeader}>
+                    <Text style={styles.titleText}>Pickup Details</Text>
+                    <View>
+                        <Text style={styles.infoText}>Invoice #: {invoiceNumber}</Text>
+                        <Text style={styles.infoText}>Date: {formData.date}</Text>
+                        <Text style={styles.infoText}>Time: {formData.time}</Text>
+                    </View>
+                </View>
 
-            <Text style={styles.thankYouText}>Thank you for your business!</Text>
-            <Text style={styles.smallText}>Please Collect Your Order from your Selected Urban Council.</Text>
+                <View style={styles.billToSection}>
+                    <Text style={styles.subTitleText}>Bill To:</Text>
+                    <Text style={styles.text}>Name: {formData.name}</Text>
+                    <Text style={styles.text}>Phone: {formData.phone}</Text>
+                    <Text style={styles.text}>Pickup Location: {formData.urbanCouncil}</Text>
+                    <Text style={styles.text}>Email: {formData.email}</Text>
+                </View>
 
-            
-          </View>
+                <View style={styles.table}>
+                    <View style={styles.tableHeader}>
+                        <Text style={styles.tableHeaderText}>Description</Text>
+                        <Text style={styles.tableHeaderTextRight}>Quantity</Text>
+                    </View>
+
+                    <View style={styles.tableRow}>
+                        <Text style={styles.text}>Product Order</Text>
+                        <Text style={styles.textRight}>{formData.amount}</Text>
+                    </View>
+
+                    <View style={styles.tableFooter}>
+                        <Text style={styles.footerText}>Total Amount</Text>
+                        <Text style={styles.footerTextRight}>Rs {totalPrice.toFixed(2)}</Text>
+                    </View>
+                </View>
+
+                <Text style={styles.thankYouText}>Thank you for your business!</Text>
+                <Text style={styles.smallText}>Please Collect Your Order from your Selected Urban Council.</Text>
+
+                {/* Download Button */}
+                <TouchableOpacity style={styles.downloadButton} onPress={downloadInvoice}>
+                    <MaterialIcons name="download" size={24} color="white" />
+                    <Text style={styles.downloadButtonText}>Download Invoice</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 };
-
 const styles = StyleSheet.create({
   container: {
     padding: 20,
@@ -111,6 +149,7 @@ const styles = StyleSheet.create({
   },
   infoText: {
     color: '#4b5563',
+    fontWeight: 'bold',
   },
   billToSection: {
     marginBottom: 20,
@@ -190,7 +229,21 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 10,
-  }
+  },
+  downloadButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1e40af',
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginTop: 20,
+},
+downloadButtonText: {
+    color: 'white',
+    fontSize: 16,
+    marginLeft: 5,
+},
 });
 
 export default Invoice;

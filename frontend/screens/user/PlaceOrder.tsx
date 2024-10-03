@@ -4,7 +4,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../../firebaseConfig'; // Import your Firebase configuration
+import { db } from '../../firebaseConfig';
 
 type FormData = {
     name: string;
@@ -22,10 +22,14 @@ type FormData = {
 
 type RootStackParamList = {
     PlaceOrder: undefined;
-    Invoice: { formData: FormData; invoiceNumber: string; totalPrice: number };
+    Invoice: { formData: FormData; invoiceNumber: string; totalPrice: number;  unitPrice: number };
 };
 
 type PlaceOrderScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PlaceOrder'>;
+
+interface PlaceOrderProps {
+    unitPrice: number; // Expecting unitPrice as a prop
+}
 
 const PlaceOrder = () => {
     const navigation = useNavigation<PlaceOrderScreenNavigationProp>();
@@ -42,10 +46,10 @@ const PlaceOrder = () => {
         state: '',
         postCode: ''
     });
-    
+ 
     const [selectedCouncil, setSelectedCouncil] = useState<string | null>(null);
-    const unitPrice = 10; // Example unit price
-
+    const unitPrice = 10; 
+  
     const handleChange = (name: keyof FormData, value: string) => {
         setFormData({ ...formData, [name]: value });
     };
@@ -55,11 +59,14 @@ const PlaceOrder = () => {
     };
 
     const handleSubmit = async () => {
+ 
         if ( !selectedCouncil) {
+ 
             Alert.alert("Error", "Please fill in all required fields.");
             return;
         }
 
+ 
         const totalPrice = Number(unitPrice) * parseFloat(formData.amount);
         const invoiceNumber = generateInvoiceNumber();
 
@@ -73,21 +80,19 @@ const PlaceOrder = () => {
         };
 
         try {
-            // Store the order in Firebase
             await addDoc(collection(db, 'orders'), orderData);
-
-            // Navigate to the Invoice page
             navigation.navigate('Invoice', {
                 formData: orderData,
                 invoiceNumber,
                 totalPrice,
+              
             });
         } catch (error) {
             console.error('Error saving order: ', error);
             Alert.alert('Error', 'Failed to place the order. Please try again.');
         }
     };
-    
+ 
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -132,7 +137,6 @@ const PlaceOrder = () => {
                     onChangeText={(text) => handleChange('amount', text)}
                     keyboardType="numeric"
                     maxLength={3}
-                
                 />
 
                 <View style={styles.row}>

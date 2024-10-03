@@ -271,6 +271,5 @@ const styles = StyleSheet.create({
     color: '#374151',
     marginBottom: 8,
   },
-});
-
+ });
 export default OrderList;

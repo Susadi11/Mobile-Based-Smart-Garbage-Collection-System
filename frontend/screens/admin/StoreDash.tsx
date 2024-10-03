@@ -116,7 +116,17 @@ const StoreDash = ({ navigation }: any) => {
                 </ImageBackground>
 
                 <View style={styles.productsWrapper}>
+ 
                                    
+ 
+                                   <TouchableOpacity
+                                           style={styles.listBtn}
+                                           onPress={() => navigation.navigate('OrderList')}
+                                           
+                                    >
+                                        <Text style={styles.listBtnText}>View Orders</Text>
+                                    </TouchableOpacity>
+ 
                     {filteredProducts.map((product) => (
                         <View key={product.id} style={styles.productContainer}>
                             <Image
@@ -273,8 +283,8 @@ const styles = StyleSheet.create({
     
     
     listBtn: {
-      
-        position: 'absolute',
+ 
+       position: 'absolute',
         paddingVertical: 8,
         paddingHorizontal: 20,
         borderRadius: 12,
@@ -285,6 +295,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         right: 20,
         top: 20,
+ 
     },
     listBtnText: {
         color: '#fff',

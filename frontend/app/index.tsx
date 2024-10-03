@@ -163,6 +163,7 @@ const App: React.FC = () => {
   }
 
   return (
+ 
     <PaperProvider theme={theme}>
         <Stack.Navigator 
           initialRouteName="Welcome" 
@@ -189,6 +190,7 @@ const App: React.FC = () => {
           <Stack.Screen name="ProfilePage" component={ProfilePage} />
           <Stack.Screen name="Invoice" component={Invoice} />
           <Stack.Screen name="OrderList" component={OrderList} />
+ 
         </Stack.Navigator>
     </PaperProvider>
   );
