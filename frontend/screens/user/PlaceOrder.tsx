@@ -42,7 +42,7 @@ const PlaceOrder = () => {
         state: '',
         postCode: ''
     });
-    const [selectedAmount, setSelectedAmount] = useState<string | null>(null);
+    
     const [selectedCouncil, setSelectedCouncil] = useState<string | null>(null);
     const unitPrice = 10; // Example unit price
 
@@ -55,17 +55,17 @@ const PlaceOrder = () => {
     };
 
     const handleSubmit = async () => {
-        if (!selectedAmount || !selectedCouncil) {
+        if ( !selectedCouncil) {
             Alert.alert("Error", "Please fill in all required fields.");
             return;
         }
 
-        const totalPrice = Number(unitPrice) * parseFloat(selectedAmount || '0');
+        const totalPrice = Number(unitPrice) * parseFloat(formData.amount);
         const invoiceNumber = generateInvoiceNumber();
 
         const orderData = {
             ...formData,
-            amount: selectedAmount,
+            amount: formData.amount,
             urbanCouncil: selectedCouncil,
             totalPrice,
             invoiceNumber,

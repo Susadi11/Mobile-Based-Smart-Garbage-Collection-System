@@ -3,6 +3,7 @@ import { ScrollView, View, Text, StyleSheet } from 'react-native';
 import { Card, Title, Paragraph } from 'react-native-paper'; // Importing components from react-native-paper
 import { RouteProp } from '@react-navigation/native';
 
+
 type RouteParams = {
     params: {
         formData: {
@@ -19,7 +20,7 @@ type RouteParams = {
     };
 };
 
-const InvoiceScreen = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
+const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
     const { formData, invoiceNumber, totalPrice } = route.params; // Retrieve data passed via navigation
 
     return (
@@ -192,4 +193,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default InvoiceScreen;
+export default Invoice;
