@@ -253,7 +253,8 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   statusText: {
-    color: "black",
+    color: "red",
+    
   },
   modalOverlay: {
     flex: 1,
@@ -292,14 +293,15 @@ const styles = StyleSheet.create({
   },
   statusButton: {
     paddingVertical: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 7,
     backgroundColor: "#4caf50",
     borderRadius: 5,
-    width:88,
+    width:82,
   },
   statusButtonText: {
     color: "#fff",
     fontSize: 16,
+    
   },
 });
 
