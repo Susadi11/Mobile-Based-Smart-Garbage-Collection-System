@@ -4,6 +4,7 @@ import { RouteProp } from '@react-navigation/native';
  
 import { MaterialIcons } from '@expo/vector-icons'; // Import icons
 
+
 type RouteParams = {
     params: {
         formData: {
@@ -21,11 +22,10 @@ type RouteParams = {
 };
 
 const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
-    const { formData, invoiceNumber, totalPrice } = route.params;
-
-    // Function to generate and download PDF
-   
-
+ 
+    const { formData, invoiceNumber, totalPrice } = route.params; // Retrieve data passed via navigation
+ 
+ 
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.invoiceContainer}>
