@@ -20,7 +20,8 @@ import WelcomePage from '@/screens/WelcomePage';
 import AddBulkPage from '@/screens/user/AddBulkPage';
 import AddProduct from '@/screens/admin/AddProduct';
 import PlaceOrder from '@/screens/user/PlaceOrder';
-import Invoice from '@/screens/user/Invoice'; 
+import Invoice from '@/screens/user/Invoice';
+import OrderList from '@/screens/admin/OrderList';
 import UpdateProduct from '@/screens/admin/UpdateProduct';
 import AddComplaint from '@/screens/user/AddComplaint';
 import ComplainRead from '@/screens/user/ComplainRead';
@@ -171,6 +172,10 @@ const App: React.FC = () => {
             name="Invoice"
             component={Invoice}
 
+          />
+             <Stack.Screen
+            name="OrderList"
+            component={OrderList}
           />
  
         </Stack.Navigator>

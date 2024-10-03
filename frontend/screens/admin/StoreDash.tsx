@@ -95,6 +95,7 @@ const StoreDash = ({ navigation }: any) => {
                 >
                     <View style={styles.overlay}>
                         <Text style={styles.title}>Product Dashboard</Text>
+                       
                         <View style={styles.inputContainer}>
                             <TextInput
                                 style={styles.input}
@@ -108,6 +109,13 @@ const StoreDash = ({ navigation }: any) => {
                 </ImageBackground>
 
                 <View style={styles.productsWrapper}>
+                                    <TouchableOpacity
+                                           style={styles.listBtn}
+                                           onPress={() => navigation.navigate('OrderList')}
+                                           
+                                    >
+                                        <Text style={styles.listBtnText}>View Orders</Text>
+                                    </TouchableOpacity>
                     {filteredProducts.map((product) => (
                         <View key={product.id} style={styles.productContainer}>
                             <Image
@@ -125,7 +133,7 @@ const StoreDash = ({ navigation }: any) => {
                                     <Text style={{ fontWeight: 'bold' }}>Benefits:</Text> {product.benefits}
                                 </Text>
                                 <View style={styles.actionButtons}>
-                                <TouchableOpacity 
+                                    <TouchableOpacity 
                                         style={styles.updateButton}
                                         onPress={() => navigation.navigate('UpdateProduct', { productId: product.id })}
                                     >
@@ -260,6 +268,24 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
     },
+    
+    
+    listBtn: {
+        backgroundColor: '#4CAF50',
+        paddingVertical: 10,
+        paddingHorizontal: 140,
+        borderRadius: 10,
+        marginTop:10,
+        marginLeft: 10,
+        marginRight: 10,
+    },
+    listBtnText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
+        justifyContent: 'center',
+    },
+    
     deleteButton: {
         backgroundColor: '#e53935',
         paddingVertical: 5,
