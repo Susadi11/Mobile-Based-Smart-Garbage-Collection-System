@@ -30,6 +30,9 @@ import PendingComplaints from '@/screens/admin/PendingComplaints';
 import BulkSchedules from '@/components/Admin/Bulk/BulkSchedules';
 import ProfilePage from '@/screens/Profile';
 import NormalSchedules from '@/components/Admin/Bulk/NormalSchedules';
+import ComplaintPending from '@/screens/admin/ComplaintPending';
+import ComplaintResolve from '@/screens/admin/ComplaintResolve';
+import ComplaintProcessing from '@/screens/admin/ComplaintProcessing';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -173,6 +176,9 @@ const App: React.FC = () => {
           <Stack.Screen name="AddComplaint" component={AddComplaint} />
           <Stack.Screen name="ComplainRead" component={ComplainRead} />
           <Stack.Screen name="AllComplaints" component={AllComplaints} />
+          <Stack.Screen name="ComplaintPending" component={ComplaintPending} />
+          <Stack.Screen name="ComplaintResolve" component={ComplaintResolve} />
+          <Stack.Screen name="ComplaintProcessing" component={ComplaintProcessing} />
           <Stack.Screen name="AddProduct" component={AddProduct} />
           <Stack.Screen name="PlaceOrder" component={PlaceOrder} />
           <Stack.Screen name="StoreDash" component={StoreDash} />

@@ -92,7 +92,7 @@ const ComplaintResolve = () => {
       {/* Total Resolved Complaints Count */}
       <View style={styles.complaintCountContainer}>
         <Icon name="check" size={30} color="#4caf50" />
-        <Text style={styles.complaintCountText}>Total Resolved Complaints: {filteredComplaints.length}</Text>
+        <Text style={styles.complaintCountText}>Total Complaints: {filteredComplaints.length}</Text>
       </View>
 
       {/* Search Bar */}
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
-    marginVertical: 10,
+    marginVertical: 3,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
