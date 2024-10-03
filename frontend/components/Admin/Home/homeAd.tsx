@@ -1,18 +1,44 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
+import { app } from '../../../firebaseConfig'; // Adjust the path as needed
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 type RootStackParamList = {
   Home: undefined;
   BulkSchedules: undefined;
+  NormalSchedules: undefined;
+  AllComplaints: undefined;
+  Analytics: undefined;
   // Add other screens here
 };
 
 const HomeAd = () => {
   const [activeDot, setActiveDot] = useState<number>(0);
+  const [totalOrders, setTotalOrders] = useState<number>(0);
+  const [pendingComplaints, setPendingComplaints] = useState<number>(0);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const firestore = getFirestore(app);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const ordersSnapshot = await getDocs(collection(firestore, 'orders'));
+        setTotalOrders(ordersSnapshot.size);
+
+        const complaintsQuery = query(collection(firestore, 'complaints'), where('status', '==', 'Pending'));
+        const complaintsSnapshot = await getDocs(complaintsQuery);
+        setPendingComplaints(complaintsSnapshot.size);
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const lineData = {
     labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
@@ -147,59 +173,39 @@ const HomeAd = () => {
         {/* Card 2 (Bulk Schedules) */}
         <TouchableOpacity
           style={[styles.card, styles.halfCard]}
-          onPress={() => navigation.navigate('BulkSchedules')}
-        >
+          onPress={() => navigation.navigate('BulkSchedules')}>
+          <Icon name="truck" size={40} color="#007BFF" style={styles.cardIcon} />
           <Text style={styles.title}>Bulk Schedules</Text>
           <Text style={styles.description}>View all bulk schedules</Text>
         </TouchableOpacity>
 
-        {/* Card 3 */}
-        <View style={[styles.card, styles.halfCard]}>
+        {/* Card 3 (Normal Schedules) */}
+        <TouchableOpacity
+          style={[styles.card, styles.halfCard]}
+          onPress={() => navigation.navigate('NormalSchedules')}>
+          <Icon name="calendar-check" size={40} color="#28a745" style={styles.cardIcon} />
           <Text style={styles.title}>Normal Schedules</Text>
-          <Text style={styles.description}>This is the description for Card 3.</Text>
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Learn More</Text>
-          </TouchableOpacity>
+          <Text style={styles.description}>View all normal schedules</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.row}>
+        {/* Card 4 (Total Orders) */}
+        <View style={[styles.card, styles.halfCard]}>
+          <Icon name="shopping" size={40} color="#ffc107" style={styles.cardIcon} />
+          <Text style={styles.title}>Total Orders</Text>
+          <Text style={styles.orderCount}>{totalOrders}</Text>
+          <Text style={styles.description}>Total number of orders placed</Text>
         </View>
-      </View>
 
-
-      {/* Card 4 */}
-      <View style={styles.card}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/150/FF33A1/FFFFFF?text=Card+4' }}
-          style={styles.image}
-        />
-        <Text style={styles.title}>Card Title 4</Text>
-        <Text style={styles.description}>This is the description for Card 4.</Text>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Learn More</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Card 5 */}
-      <View style={styles.card}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/150/FFD700/FFFFFF?text=Card+5' }}
-          style={styles.image}
-        />
-        <Text style={styles.title}>Card Title 5</Text>
-        <Text style={styles.description}>This is the description for Card 5.</Text>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Learn More</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Card 6 */}
-      <View style={styles.card}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/150/4B0082/FFFFFF?text=Card+6' }}
-          style={styles.image}
-        />
-        <Text style={styles.title}>Card Title 6</Text>
-        <Text style={styles.description}>This is the description for Card 6.</Text>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Learn More</Text>
+        {/* Card 6 (Pending Complaints) - New Card */}
+        <TouchableOpacity
+          style={[styles.card, styles.halfCard]}
+          onPress={() => navigation.navigate('AllComplaints')}>
+          <Icon name="alert-circle" size={40} color="#dc3545" style={styles.cardIcon} />
+          <Text style={styles.title}>Pending Complaints</Text>
+          <Text style={styles.orderCount}>{pendingComplaints}</Text>
+          <Text style={styles.description}>Complaints awaiting resolution</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -210,71 +216,61 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     flexGrow: 1,
+    backgroundColor: '#f8f9fa',
   },
   pageTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 16,
+    marginBottom: 20,
     textAlign: 'center',
+    color: '#343a40',
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 30,
+    borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
     width: '100%',
-    marginBottom: 16,
-    padding: 16,
+    marginBottom: 20,
+    padding: 20,
+    alignItems: 'center',
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 8,
+    marginBottom: 12,
     textAlign: 'center',
-  },
-  image: {
-    width: '100%',
-    height: 100,
-    borderRadius: 8,
+    color: '#343a40',
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginTop: 8,
+    marginTop: 12,
+    color: '#343a40',
   },
   description: {
     fontSize: 14,
-    color: '#666',
-    marginTop: 4,
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    borderRadius: 4,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    marginTop: 12,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#6c757d',
+    marginTop: 8,
+    textAlign: 'center',
   },
   navigationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 12,
+    marginTop: 16,
   },
   dotContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 8,
+    marginHorizontal: 12,
   },
   dot: {
     width: 10,
@@ -283,36 +279,39 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   arrowButton: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
   },
   arrowText: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#007BFF',
   },
   barChartContainer: {
     marginTop: 20,
   },
-  barChartTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
   barChartSubtitle: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 16,
+    color: '#6c757d',
     textAlign: 'center',
     marginBottom: 12,
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // To ensure cards are spaced evenly
-    marginBottom: 16,
+    justifyContent: 'space-between',
+    marginBottom: 20,
   },
   halfCard: {
-    flex: 0.48, // Adjust this value to control the width of each card
+    flex: 0.48,
   },
-  
+  cardIcon: {
+    marginBottom: 12,
+  },
+  orderCount: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#343a40',
+    marginTop: 8,
+  },
 });
 
 export default HomeAd;

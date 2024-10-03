@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert, TextInput, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput, Alert, Platform } from 'react-native';
 import { getFirestore, collection, getDocs, updateDoc, doc } from 'firebase/firestore';
 import { app } from '../../../firebaseConfig'; // Adjust the path to your firebase config
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Print from 'expo-print';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type RootStackParamList = {
-  BulkSchedules: undefined;
+  NormalSchedules: undefined;
 };
 
 interface Schedule {
@@ -26,8 +26,8 @@ interface Schedule {
   isComplete: boolean;
 }
 
-type BulkSchedulesProps = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'BulkSchedules'>;
+type NormalSchedulesProps = {
+  navigation: NativeStackNavigationProp<RootStackParamList, 'NormalSchedules'>;
 };
 
 const CustomCheckbox = ({ value, onValueChange }: { value: boolean; onValueChange: (value: boolean) => void }) => (
@@ -38,7 +38,7 @@ const CustomCheckbox = ({ value, onValueChange }: { value: boolean; onValueChang
   </TouchableOpacity>
 );
 
-const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
+const NormalSchedules = ({ navigation }: NormalSchedulesProps) => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [filteredSchedules, setFilteredSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,15 +48,17 @@ const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
-        const querySnapshot = await getDocs(collection(firestore, 'wasteSchedules'));
-        const fetchedSchedules = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })) as Schedule[];
-        setSchedules(fetchedSchedules.filter((schedule) => !schedule.isComplete));
-        setFilteredSchedules(fetchedSchedules.filter((schedule) => !schedule.isComplete));
+        const querySnapshot = await getDocs(collection(firestore, 'wasteSchedules')); // Changed from 'normalSchedules' to 'wasteSchedules'
+        const fetchedSchedules = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter((schedule: any) => schedule.scheduleType === 'normal') as Schedule[]; // Filter for normal schedules
+        setSchedules(fetchedSchedules);
+        setFilteredSchedules(fetchedSchedules);
       } catch (error) {
-        console.error('Error fetching bulk schedules: ', error);
+        console.error('Error fetching normal schedules: ', error);
       } finally {
         setLoading(false);
       }
@@ -75,9 +77,11 @@ const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
 
   const markAsComplete = async (id: string) => {
     try {
-      const scheduleRef = doc(firestore, 'wasteSchedules', id);
+      const scheduleRef = doc(firestore, 'wasteSchedules', id); // Changed from 'normalSchedules' to 'wasteSchedules'
       await updateDoc(scheduleRef, { isComplete: true });
-      const updatedSchedules = schedules.filter((schedule) => schedule.id !== id);
+      const updatedSchedules = schedules.map(schedule => 
+        schedule.id === id ? { ...schedule, isComplete: true } : schedule
+      );
       setSchedules(updatedSchedules);
       setFilteredSchedules(updatedSchedules);
     } catch (error) {
@@ -122,7 +126,7 @@ const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
           </style>
         </head>
         <body>
-          <h1>Bulk Schedules Report</h1>
+          <h1>Normal Schedules Report</h1>
           <table>
             <thead>
               <tr>
@@ -143,7 +147,7 @@ const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
 
     try {
       const { uri } = await Print.printToFileAsync({ html: htmlContent });
-      const fileName = 'BulkSchedulesReport.pdf';
+      const fileName = 'NormalSchedulesReport.pdf';
 
       if (Platform.OS === 'android') {
         const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
@@ -188,7 +192,7 @@ const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="arrow-back" size={28} color="black" />
         </TouchableOpacity>
-        <Text style={styles.pageTitle}>Bulk Schedules</Text>
+        <Text style={styles.pageTitle}>Normal Schedules</Text>
       </View>
 
       <TextInput
@@ -257,18 +261,6 @@ const styles = StyleSheet.create({
     borderColor: '#d1d5db',
     borderWidth: 1,
   },
-  button: {
-    backgroundColor: '#047857',
-    padding: 12,
-    borderRadius: 25,
-    marginVertical: 16,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   scheduleItem: {
     backgroundColor: '#fff',
     padding: 16,
@@ -316,6 +308,18 @@ const styles = StyleSheet.create({
   checkboxChecked: {
     backgroundColor: '#047857',
   },
+  button: {
+    backgroundColor: '#047857',
+    padding: 12,
+    borderRadius: 25,
+    marginVertical: 16,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });
 
-export default BulkSchedules;
+export default NormalSchedules;

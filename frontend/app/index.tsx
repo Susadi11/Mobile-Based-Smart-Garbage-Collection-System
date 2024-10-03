@@ -1,11 +1,12 @@
-// Import necessary modules
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NavigationContainer } from '@react-navigation/native';
-import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter'; 
+import * as SplashScreen from 'expo-splash-screen';
 
 // Import your screens here
 import HomePage from '@/screens/user/HomePage';
@@ -28,13 +29,36 @@ import ComplainRead from '@/screens/user/ComplainRead';
 import AllComplaints from '@/screens/admin/AllComplaints';
 import PendingComplaints from '@/screens/admin/PendingComplaints';
 import BulkSchedules from '@/components/Admin/Bulk/BulkSchedules';
+import ProfilePage from '@/screens/Profile';
+import NormalSchedules from '@/components/Admin/Bulk/NormalSchedules';
+import ComplaintPending from '@/screens/admin/ComplaintPending';
+import ComplaintResolve from '@/screens/admin/ComplaintResolve';
+import ComplaintProcessing from '@/screens/admin/ComplaintProcessing';
 
-// Define stack and tab navigators
+SplashScreen.preventAutoHideAsync();
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-// Animated icon component to apply scale animation
-const AnimatedIcon: React.FC<{ routeName: string; focused: boolean; color: string }> = ({ routeName, focused, color }) => {
+// Custom theme with Inter font
+const theme = {
+  ...DefaultTheme,
+  fonts: {
+    ...DefaultTheme.fonts,
+    regular: { fontFamily: 'Inter_400Regular' },
+    medium: { fontFamily: 'Inter_500Medium' },
+    light: { fontFamily: 'Inter_400Regular' },
+    thin: { fontFamily: 'Inter_400Regular' },
+  },
+};
+
+interface AnimatedIconProps {
+  routeName: string;
+  focused: boolean;
+  color: string;
+}
+
+const AnimatedIcon: React.FC<AnimatedIconProps> = ({ routeName, focused, color }) => {
   const scale = useSharedValue(focused ? 1 : 0);
 
   useEffect(() => {
@@ -71,7 +95,6 @@ const AnimatedIcon: React.FC<{ routeName: string; focused: boolean; color: strin
   return <Animated.View style={animatedStyle}>{renderIcon(routeName)}</Animated.View>;
 };
 
-// Admin Tabs with animated icons
 const AdminTabs: React.FC = () => (
   <Tab.Navigator
     initialRouteName="HomeDash"
@@ -81,9 +104,12 @@ const AdminTabs: React.FC = () => (
       tabBarActiveTintColor: '#3d9c56',
       tabBarInactiveTintColor: '#737373',
       tabBarStyle: {
-        height: 80, // Increase height of the tab bar
-        paddingBottom: 10, // Adjust padding for better alignment
+        height: 80,
+        paddingBottom: 10,
         paddingTop: 10,
+      },
+      tabBarLabelStyle: {
+        fontFamily: 'Inter_400Regular',
       },
     })}
   >
@@ -94,7 +120,6 @@ const AdminTabs: React.FC = () => (
   </Tab.Navigator>
 );
 
-// User Tabs with animated icons
 const UserTabs: React.FC = () => (
   <Tab.Navigator
     initialRouteName="HomePage"
@@ -104,9 +129,12 @@ const UserTabs: React.FC = () => (
       tabBarActiveTintColor: '#3d9c56',
       tabBarInactiveTintColor: '#737373',
       tabBarStyle: {
-        height: 80, // Increase height of the tab bar
-        paddingBottom: 10, // Adjust padding for better alignment
+        height: 80,
+        paddingBottom: 10,
         paddingTop: 10,
+      },
+      tabBarLabelStyle: {
+        fontFamily: 'Inter_400Regular',
       },
     })}
   >
@@ -117,66 +145,51 @@ const UserTabs: React.FC = () => (
   </Tab.Navigator>
 );
 
-// Main App component
 const App: React.FC = () => {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_700Bold,
+  });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <PaperProvider>
-        <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
-          <Stack.Screen
-            name="Welcome"
-            component={WelcomePage}
-          />
-          <Stack.Screen
-            name="AdminTabs"
-            component={AdminTabs}
-          />
-          <Stack.Screen
-            name="UserTabs"
-            component={UserTabs}
-          />
-          <Stack.Screen
-            name="AddBulkPage"
-            component={AddBulkPage}
-          />
-           <Stack.Screen
-
-            name="AddComplaint"
-            component={AddComplaint}
-          />
-           <Stack.Screen
-            name="ComplainRead"
-            component={ComplainRead}
-          />
-          <Stack.Screen
-            name="AllComplaints"
-            component={AllComplaints}
-          />
-          <Stack.Screen
-            name="AddProduct"
-            component={AddProduct}
-          />
-          <Stack.Screen
-            name="PlaceOrder"
-            component={PlaceOrder}
-
-          />
-            <Stack.Screen
-            name="StoreDash"
-            component={StoreDash}
-          />
-            <Stack.Screen
-            name="UpdateProduct"
-            component={UpdateProduct}
-          />
-          <Stack.Screen
-            name="Invoice"
-            component={Invoice}
-
-          />
-             <Stack.Screen
-            name="OrderList"
-            component={OrderList}
-          />
+ 
+    <PaperProvider theme={theme}>
+        <Stack.Navigator 
+          initialRouteName="Welcome" 
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen name="Welcome" component={WelcomePage} />
+          <Stack.Screen name="AdminTabs" component={AdminTabs} />
+          <Stack.Screen name="UserTabs" component={UserTabs} />
+          <Stack.Screen name="AddBulkPage" component={AddBulkPage} />
+          <Stack.Screen name="AddComplaint" component={AddComplaint} />
+          <Stack.Screen name="ComplainRead" component={ComplainRead} />
+          <Stack.Screen name="AllComplaints" component={AllComplaints} />
+          <Stack.Screen name="ComplaintPending" component={ComplaintPending} />
+          <Stack.Screen name="ComplaintResolve" component={ComplaintResolve} />
+          <Stack.Screen name="ComplaintProcessing" component={ComplaintProcessing} />
+          <Stack.Screen name="AddProduct" component={AddProduct} />
+          <Stack.Screen name="PlaceOrder" component={PlaceOrder} />
+          <Stack.Screen name="StoreDash" component={StoreDash} />
+          <Stack.Screen name="UpdateProduct" component={UpdateProduct} />
+          <Stack.Screen name="BulkSchedules" component={BulkSchedules} />
+          <Stack.Screen name="NormalSchedules" component={NormalSchedules} />
+          <Stack.Screen name="ProfilePage" component={ProfilePage} />
+          <Stack.Screen name="Invoice" component={Invoice} />
+          <Stack.Screen name="OrderList" component={OrderList} />
  
         </Stack.Navigator>
     </PaperProvider>
