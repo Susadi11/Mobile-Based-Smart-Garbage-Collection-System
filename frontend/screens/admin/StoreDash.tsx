@@ -91,9 +91,16 @@ const StoreDash = ({ navigation }: any) => {
         <View style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContainer}>
                 <ImageBackground
-                    source={{ uri: 'https://m.media-amazon.com/images/I/41san9tTmAL._AC_UF1000,1000_QL80_.jpg' }}
+                    source={{ uri: 'https://img.freepik.com/free-photo/overhead-view-shovel-seedling-peat-pots-soil-dirty-wooden-bench_23-2148044449.jpg' }}
                 >
                     <View style={styles.overlay}>
+                                    <TouchableOpacity
+                                           style={styles.listBtn}
+                                           onPress={() => navigation.navigate('OrderList')}
+                                           
+                                    >
+                                        <Text style={styles.listBtnText}>View Orders</Text>
+                                    </TouchableOpacity>
                         <Text style={styles.title}>Product Dashboard</Text>
                        
                         <View style={styles.inputContainer}>
@@ -109,13 +116,17 @@ const StoreDash = ({ navigation }: any) => {
                 </ImageBackground>
 
                 <View style={styles.productsWrapper}>
-                                    <TouchableOpacity
+ 
+                                   
+ 
+                                   <TouchableOpacity
                                            style={styles.listBtn}
                                            onPress={() => navigation.navigate('OrderList')}
                                            
                                     >
                                         <Text style={styles.listBtnText}>View Orders</Text>
                                     </TouchableOpacity>
+ 
                     {filteredProducts.map((product) => (
                         <View key={product.id} style={styles.productContainer}>
                             <Image
@@ -184,6 +195,7 @@ const styles = StyleSheet.create({
         fontSize: 33,
         textAlign: 'center',
         marginBottom: 20,
+        marginTop: 20,
     },
     inputContainer: {
         width: '90%',
@@ -271,13 +283,19 @@ const styles = StyleSheet.create({
     
     
     listBtn: {
-        backgroundColor: '#4CAF50',
-        paddingVertical: 10,
-        paddingHorizontal: 140,
-        borderRadius: 10,
-        marginTop:10,
-        marginLeft: 10,
-        marginRight: 10,
+ 
+       position: 'absolute',
+        paddingVertical: 8,
+        paddingHorizontal: 20,
+        borderRadius: 12,
+        backgroundColor: '#4CAF50', // Equivalent to bg-gray-900
+        borderWidth: 2,
+        borderColor: 'transparent',
+        alignItems: 'center',
+        justifyContent: 'center',
+        right: 20,
+        top: 20,
+ 
     },
     listBtnText: {
         color: '#fff',

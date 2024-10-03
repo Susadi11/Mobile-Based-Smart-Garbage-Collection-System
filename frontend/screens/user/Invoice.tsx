@@ -4,6 +4,7 @@ import { RouteProp } from '@react-navigation/native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf'; // Import the library
 import { MaterialIcons } from '@expo/vector-icons'; // Import icons
 
+
 type RouteParams = {
     params: {
         formData: {
@@ -21,7 +22,9 @@ type RouteParams = {
 };
 
 const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
-    const { formData, invoiceNumber, totalPrice } = route.params;
+ 
+    const { formData, invoiceNumber, totalPrice } = route.params; // Retrieve data passed via navigation
+ 
 
     // Function to generate and download PDF
     const downloadInvoice = async () => {
@@ -54,7 +57,7 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
             console.error(error);
         }
     };
-
+ 
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.invoiceContainer}>

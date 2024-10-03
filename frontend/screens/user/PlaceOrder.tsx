@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { collection, addDoc } from 'firebase/firestore';
@@ -32,7 +31,7 @@ interface PlaceOrderProps {
     unitPrice: number; // Expecting unitPrice as a prop
 }
 
-const PlaceOrder = ({ unitPrice }: PlaceOrderProps) => {
+const PlaceOrder = () => {
     const navigation = useNavigation<PlaceOrderScreenNavigationProp>();
     const [formData, setFormData] = useState<FormData>({
         name: '',
@@ -47,15 +46,10 @@ const PlaceOrder = ({ unitPrice }: PlaceOrderProps) => {
         state: '',
         postCode: ''
     });
-
+ 
     const [selectedCouncil, setSelectedCouncil] = useState<string | null>(null);
-
-    const [showDatePicker, setShowDatePicker] = useState(false);
-    const [showTimePicker, setShowTimePicker] = useState(false);
-
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-    const [selectedTime, setSelectedTime] = useState<Date | undefined>(undefined);
-
+    const unitPrice = 10; 
+  
     const handleChange = (name: keyof FormData, value: string) => {
         setFormData({ ...formData, [name]: value });
     };
@@ -65,24 +59,21 @@ const PlaceOrder = ({ unitPrice }: PlaceOrderProps) => {
     };
 
     const handleSubmit = async () => {
-        const { name, phone, email, amount, urbanCouncil, area, city, state, postCode } = formData;
-
-        if (!name || !phone || !email || !amount || !selectedDate || !selectedTime || !area || !city || !state || !postCode) {
+ 
+        if ( !selectedCouncil) {
+ 
             Alert.alert("Error", "Please fill in all required fields.");
             return;
         }
 
-       
-
-        const totalPrice = unitPrice * parseFloat(amount); // Calculate total price
+ 
+        const totalPrice = Number(unitPrice) * parseFloat(formData.amount);
         const invoiceNumber = generateInvoiceNumber();
 
         const orderData = {
             ...formData,
-            amount , // Store amount as string in orderData
-            date: selectedDate?.toISOString().split('T')[0],
-            time: selectedTime?.toTimeString().split(' ')[0],
-            urbanCouncil: selectedCouncil || '',
+            amount: formData.amount,
+            urbanCouncil: selectedCouncil,
             totalPrice,
             invoiceNumber,
             createdAt: new Date().toISOString(),
@@ -94,29 +85,14 @@ const PlaceOrder = ({ unitPrice }: PlaceOrderProps) => {
                 formData: orderData,
                 invoiceNumber,
                 totalPrice,
-                unitPrice
+              
             });
         } catch (error) {
             console.error('Error saving order: ', error);
             Alert.alert('Error', 'Failed to place the order. Please try again.');
         }
     };
-
-    const handleDateChange = (event: any, selectedDateValue?: Date) => {
-        setShowDatePicker(false);
-        if (selectedDateValue) {
-            setSelectedDate(selectedDateValue);
-            handleChange('date', selectedDateValue.toISOString().split('T')[0]);
-        }
-    };
-
-    const handleTimeChange = (event: any, selectedTimeValue?: Date) => {
-        setShowTimePicker(false);
-        if (selectedTimeValue) {
-            setSelectedTime(selectedTimeValue);
-            handleChange('time', selectedTimeValue.toTimeString().split(' ')[0]);
-        }
-    };
+ 
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -163,28 +139,30 @@ const PlaceOrder = ({ unitPrice }: PlaceOrderProps) => {
                     maxLength={3}
                 />
 
-                <Text style={styles.label}>Select Date</Text>
-                <Button title={selectedDate ? selectedDate.toDateString() : "Pick Date"} onPress={() => setShowDatePicker(true)} />
-                {showDatePicker && (
-                    <DateTimePicker
-                        value={selectedDate || new Date()}
-                        mode="date"
-                        display="default"
-                        onChange={handleDateChange}
-                        minimumDate={new Date()} // Prevent past date selection
-                    />
-                )}
-
-                <Text style={styles.label}>Select Time</Text>
-                <Button title={selectedTime ? selectedTime.toTimeString().split(' ')[0] : "Pick Time"} onPress={() => setShowTimePicker(true)} />
-                {showTimePicker && (
-                    <DateTimePicker
-                        value={selectedTime || new Date()}
-                        mode="time"
-                        display="default"
-                        onChange={handleTimeChange}
-                    />
-                )}
+                <View style={styles.row}>
+                    <View style={styles.inputWrapper}>
+                        <Text style={styles.label}>Date</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="YYYY-MM-DD"
+                            value={formData.date}
+                            onChangeText={(text) => handleChange('date', text)}
+                            keyboardType="numeric"
+                            maxLength={10}
+                        />
+                    </View>
+                    <View style={styles.inputWrapper}>
+                        <Text style={styles.label}>Time</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="HH:MM"
+                            value={formData.time}
+                            onChangeText={(text) => handleChange('time', text)}
+                            keyboardType="numeric"
+                            maxLength={5}
+                        />
+                    </View>
+                </View>
 
                 <Text style={styles.label}>Urban Council</Text>
                 <RNPickerSelect
@@ -192,51 +170,68 @@ const PlaceOrder = ({ unitPrice }: PlaceOrderProps) => {
                     items={[
                         { label: 'Colombo Municipal Council', value: 'Colombo Municipal Council' },
                         { label: 'Kandy Municipal Council', value: 'Kandy Municipal Council' },
-                        // Add other urban councils here
-                    ]}
-                    placeholder={{ label: 'Select Urban Council...', value: null }}
-                    style={{ inputIOS: styles.input, inputAndroid: styles.input }}
+                        { label: 'Galle Municipal Council', value: 'Galle Municipal Council' },
+                        { label: 'Matara Municipal Council', value: 'Matara Municipal Council' },
+                        { label: 'Negombo Municipal Council', value: 'Negombo Municipal Council' },
+                        { label: 'Jaffna Municipal Council', value: 'Jaffna Municipal Council' },
+                        { label: 'Dehiwala-Mount Lavinia Municipal Council', value: 'Dehiwala-Mount Lavinia Municipal Council' },
+                        { label: 'Moratuwa Municipal Council', value: 'Moratuwa Municipal Council' },
+                        { label: 'Kurunegala Municipal Council', value: 'Kurunegala Municipal Council' },
+                        { label: 'Ratnapura Municipal Council', value: 'Ratnapura Municipal Council' },
+                        { label: 'Badulla Municipal Council', value: 'Badulla Municipal Council' },
+                                    ]}
+                    placeholder={{ label: 'Order picking urban council...', value: null }}
+                    style={{
+                        inputIOS: styles.input,
+                        inputAndroid: styles.input,
+                    }}
                 />
 
-                {/* Area Input */}
-                <Text style={styles.label}>Area</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter Area"
-                    value={formData.area}
-                    onChangeText={(text) => handleChange('area', text)}
-                />
+                <Text style={styles.subLabel}>Address Details</Text>
 
-                {/* City Input */}
-                <Text style={styles.label}>City</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter City"
-                    value={formData.city}
-                    onChangeText={(text) => handleChange('city', text)}
-                />
+                <View style={styles.row}>
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter area"
+                            value={formData.area}
+                            onChangeText={(text) => handleChange('area', text)}
+                        />
+                    </View>
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter city"
+                            value={formData.city}
+                            onChangeText={(text) => handleChange('city', text)}
+                        />
+                    </View>
+                </View>
 
-                {/* State Input */}
-                <Text style={styles.label}>State</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter State"
-                    value={formData.state}
-                    onChangeText={(text) => handleChange('state', text)}
-                />
+                <View style={styles.row}>
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter state"
+                            value={formData.state}
+                            onChangeText={(text) => handleChange('state', text)}
+                        />
+                    </View>
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Post Code"
+                            value={formData.postCode}
+                            onChangeText={(text) => handleChange('postCode', text)}
+                        />
+                    </View>
+                </View>
 
-                {/* PostCode Input */}
-                <Text style={styles.label}>Post Code</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter Post Code"
-                    value={formData.postCode}
-                    onChangeText={(text) => handleChange('postCode', text)}
-                    keyboardType="numeric"
-                    maxLength={5}
+                <Button
+                    title="Confirm Order"
+                    onPress={handleSubmit}
+                    color="#6A64F1"
                 />
-
-                <Button title="Confirm Order" onPress={handleSubmit} color="#6A64F1" />
             </View>
         </ScrollView>
     );
@@ -255,20 +250,32 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 4,
-        elevation: 3,
-    },
-    label: {
-        marginBottom: 5,
-        fontWeight: 'bold',
+        shadowRadius: 8,
+        elevation: 2,
     },
     input: {
         borderWidth: 1,
         borderColor: '#ccc',
-        borderRadius: 5,
+        borderRadius: 8,
         padding: 10,
+        marginBottom: 15,
+    },
+    label: {
+        fontWeight: 'bold',
+        marginBottom: 5,
+    },
+    subLabel: {
+        fontSize: 16,
+        marginTop: 10,
         marginBottom: 10,
-        backgroundColor: '#f9f9f9',
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    inputWrapper: {
+        flex: 1,
+        marginHorizontal: 5,
     },
 });
 
