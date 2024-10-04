@@ -161,9 +161,9 @@ const Invoice = ({ route, navigation }: { route: RouteProp<RouteParams, 'params'
                 <Text style={styles.headerText}>Order Invoice</Text>
                 <View style={styles.divider} />
                 <View style={styles.invoiceHeader}>
-                    <Text style={styles.titleText}>Pickup Details</Text>
+                    <Text style={styles.titleText}>Pickup Details:</Text>
                     <View>
-                        <Text style={styles.infoText}>Invoice #: {invoiceNumber}</Text>
+                        <Text style={styles.infoText1}>Invoice #: {invoiceNumber}</Text>
                         <Text style={styles.infoText}>Date: {formData.date}</Text>
                         <Text style={styles.infoText}>Time: {formData.time}</Text>
                     </View>
@@ -250,13 +250,20 @@ const styles = StyleSheet.create({
         fontFamily: 'Inter_400Regular',
     },
     titleText: {
-        fontSize: 18,
+        fontSize: 17,
         fontWeight: 'bold',
-        fontFamily: 'Inter_400Regular',
+        
     },
     infoText: {
         fontSize: 16,
-        fontFamily: 'Inter_400Regular',
+        fontWeight: 'bold',
+    },
+
+    infoText1: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color:'#4CAF50',
+    
     },
     billToSection: {
         marginBottom: 10,
@@ -266,7 +273,7 @@ const styles = StyleSheet.create({
         fontWeight:'bold',
         marginTop: 10,
         marginBottom: 5,
-        fontFamily: 'Inter_400Regular',
+       
     },
     text: {
         fontSize: 13,
