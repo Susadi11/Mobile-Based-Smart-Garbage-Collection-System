@@ -19,7 +19,7 @@ type CardGridNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const CardComponent: React.FC<{ title: string; iconName: string; onPress: () => void }> = ({ title, iconName, onPress }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={onPress}>
-      <Icon name={iconName} size={50} color="#4caf50" style={styles.icon} />
+      <Icon name={iconName} size={30} color="#4caf50" style={styles.icon} />
       <Text style={styles.title}>{title}</Text>
     </TouchableOpacity>
   );
@@ -97,9 +97,10 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    height: 150,
+    height: 100,
     width: "45%",
     padding: 10,
+    marginBottom:20,
   },
   icon: {
     marginBottom: 10,

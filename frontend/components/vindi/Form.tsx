@@ -247,6 +247,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#4a5568',
     textAlign: 'center',
+    
  
   },
   inputGroup: {
@@ -254,6 +255,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 30,
+    fontFamily: 'Inter_600SemiBold',
     fontWeight: 'bold',
     marginStart: 75,
     marginBottom: 20,
@@ -264,6 +266,7 @@ const styles = StyleSheet.create({
     color: '#4a5568',
     marginBottom: 4,
     marginTop: 0,
+    fontFamily: 'Inter_600SemiBold',
   },
   inputContainer: {
     flexDirection: 'row',

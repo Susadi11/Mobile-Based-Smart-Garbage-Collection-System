@@ -40,6 +40,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 2,
+        fontFamily: 'Inter_600SemiBold',
     },
     
     scrollContent: {

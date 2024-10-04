@@ -135,6 +135,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: 'black',
     fontWeight:'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   loading: {
     flex: 1,
@@ -154,6 +155,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 10,
     elevation: 5,
+    marginBottom:10,
+    
   },
   searchIcon: {
     marginRight: 10,
@@ -162,6 +165,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
+    fontFamily: 'Inter_600SemiBold',
   },
   text: {
     fontSize: 16,
@@ -171,6 +175,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "orange",
     fontWeight: "bold",
+    fontFamily: 'Inter_600SemiBold',
   },
   searchContainer: {
     flexDirection: "row",
@@ -200,9 +205,9 @@ const styles = StyleSheet.create({
   },
   complaintCountText: {
     fontSize: 18,
-    fontWeight: "bold",
     marginLeft: 10,
     color: "#4caf50",
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 
