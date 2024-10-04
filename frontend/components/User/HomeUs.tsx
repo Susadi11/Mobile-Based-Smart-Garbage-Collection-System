@@ -6,6 +6,7 @@ import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import GarbageBin from "@/components/User/GarbageBin"
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -165,6 +166,8 @@ const HomeUs: React.FC = () => {
           </TouchableOpacity>
         </View>
 
+        <GarbageBin/>
+
         {/* Waste Management Tips Section with Dots */}
         <View style={styles.advertisement}>
           <Animated.Text style={[styles.adTitle, { opacity: fadeAnim }]}>
@@ -262,7 +265,7 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    // marginBottom: 0,
   },
   actionButton: {
     alignItems: 'center',
