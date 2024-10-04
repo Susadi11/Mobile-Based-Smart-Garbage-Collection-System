@@ -8,6 +8,7 @@ import { getFirestore, collection, addDoc, updateDoc, doc } from 'firebase/fires
 import { app } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 type RootStackParamList = {
   BulkPage: undefined;
@@ -34,6 +35,12 @@ interface BulkProps {
 
 const Bulk: React.FC<BulkProps> = ({ existingTransaction, onAddComplete, onUpdateComplete }) => {
   const navigation = useNavigation<BulkNavigationProp>();
+  
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   const [name, setName] = useState<string>('');
   const [scheduleType, setScheduleType] = useState<string>('');
@@ -134,6 +141,10 @@ const Bulk: React.FC<BulkProps> = ({ existingTransaction, onAddComplete, onUpdat
       }
     }
   };  
+
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -249,20 +260,22 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 16,
-    backgroundColor: '#f3f4f6', // bg-gray-100
+    backgroundColor: '#f3f4f6', 
   },
   heading: {
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 16,
-    color: '#047857', // text-green-700
+    color: '#047857', 
+    fontFamily: 'Inter_700Bold',
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
     marginVertical: 8,
-    color: '#1f2937', // text-gray-800
+    color: '#1f2937', 
+    fontFamily: 'Inter_600SemiBold',
   },
   inputContainer: {
     marginBottom: 12,
@@ -271,44 +284,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    color: '#1f2937', // text-gray-800
+    color: '#1f2937', 
+    fontFamily: 'Inter_600SemiBold',
   },
   inputContainerStyle: {
     borderWidth: 1,
-    borderColor: '#d1d5db', // border-gray-300
-    borderRadius: 10, // Rounded corners
+    borderColor: '#d1d5db', 
+    borderRadius: 10, 
     paddingHorizontal: 6,
   },
   pickerContainer: {
     borderWidth: 1,
-    borderColor: '#d1d5db', // border-gray-300
-    borderRadius: 10, // Rounded corners
+    borderColor: '#d1d5db', 
+    borderRadius: 10, 
     marginBottom: 12,
     overflow: 'hidden',
   },
   checkboxContainer: {
     backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#d1d5db', // border-gray-300
-    borderRadius: 10, // Rounded corners
+    borderColor: '#d1d5db', 
+    borderRadius: 10, 
     padding: 12,
     marginBottom: 8,
   },
   checkboxText: {
     fontSize: 16,
-    color: '#4b5563', // text-gray-600
+    color: '#4b5563', 
+    fontFamily: 'Inter_600SemiBold',
   },
   map: {
     width: '100%',
     height: 300,
     marginVertical: 12,
-    borderRadius: 10, // Rounded corners
+    borderRadius: 10, 
   },
   button: {
     backgroundColor: '#10b981', // bg-green-500
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 10, // Rounded corners
+    borderRadius: 10, 
     marginBottom: 12,
   },
   buttonActive: {
@@ -319,6 +334,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     textAlign: 'center',
+    fontFamily: 'Inter_600SemiBold',
   },
   submitButton: {
     backgroundColor: '#059669', // bg-green-600
@@ -332,6 +348,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 

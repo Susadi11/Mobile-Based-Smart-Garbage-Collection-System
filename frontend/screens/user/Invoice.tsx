@@ -26,22 +26,10 @@ type RouteParams = {
 
 const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
     const { formData, invoiceNumber,totalPrice } = route.params; // Retrieve data passed via navigation
+ 
     
     
-    const orders = [
-        {
-            name: formData.name,
-            phone: formData.phone,
-            email: formData.email,
-            amount: formData.amount,
-            date: formData.date,
-            time: formData.time,
-            urbanCouncil: formData.urbanCouncil,
-            totalPrice: totalPrice,
-            invoiceNumber: invoiceNumber,
-        },
-    ];
-
+   
     const generateReport = async () => {
         const order = {
             name: formData.name,
@@ -73,7 +61,7 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
                         }
                         h1 {
                             text-align: center;
-                            color: #10b981;
+ 
                         }
                         .section {
                             margin-bottom: 20px;
@@ -87,6 +75,8 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
                             display: flex;
                             justify-content: space-between;
                             padding: 5px 0;
+                            font-size: 16px;
+ 
                         }
                         .footer {
                             margin-top: 20px;
@@ -96,12 +86,15 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
                         }
                         .thank-you {
                             font-weight: bold;
+ 
                         }
                     </style>
                 </head>
                 <body>
                     <div class="receipt">
-                        <h1>Invoice</h1>
+ 
+                        <h1>Order Invoice</h1>
+ 
                         <div class="section">
                             <div class="section-title">Invoice Details</div>
                             <div class="item"><span>Invoice #:</span><span>${order.invoiceNumber}</span></div>
@@ -243,6 +236,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         marginBottom: 10,
+ 
     },
     titleText: {
         fontSize: 18,
