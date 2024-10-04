@@ -4,7 +4,8 @@ import { getFirestore, doc, getDoc, updateDoc, deleteDoc } from 'firebase/firest
 import { app } from '../../firebaseConfig'; // Ensure the path is correct based on your project structure
 import { RouteProp } from '@react-navigation/native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import Navbar from '@/components/vindi/NavBar';
+import MapView, { Marker } from 'react-native-maps';
+
 
 type RootStackParamList = {
   ComplainRead: { complaintId: string };
@@ -76,14 +77,15 @@ const ComplainRead: React.FC = () => {
   const handleUpdate = async () => {
     try {
       await updateDoc(doc(firestore, 'complaints', complaintId), formData);
+      setComplaintData(formData); // Update the complaint data state with the updated form data
       Alert.alert('Success', 'Complaint updated successfully!');
-      setEditable(false);
+      setEditable(false); // Exit the edit mode after successful update
     } catch (err) {
       console.error('Error updating document: ', err);
       Alert.alert('Error', 'Failed to update complaint. Please try again.');
     }
   };
-
+  
   const handleDelete = async () => {
     try {
       await deleteDoc(doc(firestore, 'complaints', complaintId));
@@ -97,6 +99,16 @@ const ComplainRead: React.FC = () => {
 
   const handleChange = (field: keyof FormData, value: string) => {
     setFormData(prevData => ({ ...prevData, [field]: value }));
+  };
+  const handleMapPress = (event: { nativeEvent: { coordinate: { latitude: number; longitude: number } } }) => {
+    const { coordinate } = event.nativeEvent;
+    setFormData(prevData => ({
+      ...prevData,
+      location: {
+        latitude: coordinate.latitude,
+        longitude: coordinate.longitude,
+      },
+    }));
   };
 
   const handleLocationChange = (field: 'latitude' | 'longitude', value: string) => {
@@ -120,13 +132,13 @@ const ComplainRead: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Complaint Dashboard</Text>
+       <View style={styles.header}>
+        <Text style={styles.headerTitle}>Complaint Details</Text>
       </View>
-      <Navbar />
+    
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View style={styles.card}>
-          <Text style={styles.title}>Complaint Details</Text>
+          <Text style={styles.title}> My Complaint</Text>
           {complaintData && (
             <>
               {editable ? (
@@ -157,22 +169,24 @@ const ComplainRead: React.FC = () => {
                     onChangeText={(text) => handleChange('email', text)}
                   />
                   <Text style={styles.label}>Location:</Text>
-                  <View style={styles.locationInputContainer}>
-                    <TextInput
-                      style={styles.locationInput}
-                      value={formData.location.latitude.toString()}
-                      onChangeText={(text) => handleLocationChange('latitude', text)}
-                      placeholder="Latitude"
-                      keyboardType="numeric"
+                  <MapView
+                    style={styles.map}
+                    initialRegion={{
+                      latitude: formData.location.latitude,
+                      longitude: formData.location.longitude,
+                      latitudeDelta: 0.0922,
+                      longitudeDelta: 0.0421,
+                    }}
+                    onPress={handleMapPress}
+                  >
+                    <Marker
+                      coordinate={{
+                        latitude: formData.location.latitude,
+                        longitude: formData.location.longitude,
+                      }}
                     />
-                    <TextInput
-                      style={styles.locationInput}
-                      value={formData.location.longitude.toString()}
-                      onChangeText={(text) => handleLocationChange('longitude', text)}
-                      placeholder="Longitude"
-                      keyboardType="numeric"
-                    />
-                  </View>
+                  </MapView>
+              
                   <Text style={styles.label}>Problem:</Text>
                   <TextInput
                     style={styles.input}
@@ -181,17 +195,15 @@ const ComplainRead: React.FC = () => {
                   />
                   <Text style={styles.label}>Date:</Text>
                   <TextInput
-                    style={styles.input}
+                    
                     value={formData.date}
-                    onChangeText={(text) => handleChange('date', text)}
-                    placeholder="YYYY-MM-DD"
+                   
                   />
                   <Text style={styles.label}>Time:</Text>
                   <TextInput
-                    style={styles.input}
+                    
                     value={formData.time}
-                    onChangeText={(text) => handleChange('time', text)}
-                    placeholder="HH:MM"
+                    
                   />
                 </>
               ) : (
@@ -241,23 +253,30 @@ const ComplainRead: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f0f4f8',
+    backgroundColor: '#ffffff',
+    
+  },
+  map: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 10,
   },
   header: {
     width: '100%',
-    height: 60,
-    backgroundColor: '#fff',
+    height: 90,
+    backgroundColor: '#4CAF50',
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    borderBottomRightRadius:50,
+    elevation: 4,
   },
   headerTitle: {
-    fontSize: 24,
+    fontSize: 25,
+    color: 'white',
     fontWeight: 'bold',
-    color: '#333',
   },
+
   scrollViewContent: {
     padding: 16,
   },
@@ -265,6 +284,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderRadius: 10,
     padding: 16,
+    marginTop:10,
     marginBottom: 16,
     elevation: 3,
     shadowColor: '#000',
@@ -276,8 +296,8 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   title: {
-    
-    fontSize: 20,
+    marginStart:80,
+    fontSize: 25,
     fontWeight: 'bold',
     marginBottom: 16,
     color: '#2c3e50',
@@ -327,6 +347,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#3498db',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom:50,
   },
   deleteButton: {
     backgroundColor: '#e74c3c',
@@ -338,4 +359,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ComplainRead;
+export default ComplainRead; 
