@@ -72,7 +72,9 @@ const PlaceOrder = () => {
     //   return;
     // }
 
+ 
     const unitPrice = 150;
+ 
     const totalPrice = unitPrice * Number(formData.amount);
     
     console.log('Amount', formData.amount);
