@@ -1,39 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { getDatabase, ref, onValue } from 'firebase/database';
+import { ref, onValue } from 'firebase/database';
+import { database } from '../../firebaseConfig'; // Import your Firebase config
 
 const Dustbin = () => {
-  const [garbageLevel, setGarbageLevel] = useState(20); // Default garbage level
+  const [garbageLevel, setGarbageLevel] = useState(0); // Default garbage level
+  const [binDepth, setBinDepth] = useState(0); // Bin depth
+  const [binStatus, setBinStatus] = useState(''); // Bin status
   const totalHeight = 200; // Total height of the dustbin in pixels
 
-  // Fetch garbage level from Firebase Realtime Database
+  // Fetch garbage data from Firebase Realtime Database
   useEffect(() => {
-    const db = getDatabase();
-    const garbageRef = ref(db, 'dustbins/dustbin1/level'); // Adjust the path to match your Firebase structure
+    const garbageRef = ref(database, 'garbageLevel'); // Adjust the path to match your Firebase structure
 
+    // Listen for changes in the data
     onValue(garbageRef, (snapshot) => {
-      const level = snapshot.val();
-      setGarbageLevel(level);
+      const data = snapshot.val(); // Fetch the whole garbage level object
+      setGarbageLevel(parseFloat(data.garbageLevel)); // Set the fetched garbage level
+      setBinDepth(parseFloat(data.binDepth)); // Set the fetched bin depth
+      setBinStatus(data.binStatus); // Set the bin status (e.g., empty, partially filled)
     });
   }, []);
 
   // Calculate the height of the garbage inside the bin based on the level
   const garbageHeight = (garbageLevel / 100) * totalHeight;
 
-  // Function to determine bin status (Empty, Partially Filled, Full)
-  const getBinStatus = () => {
-    if (garbageLevel >= 80) {
-      return 'Bin is Full';
-    } else if (garbageLevel > 20) {
-      return 'Bin is Partially Filled';
-    } else {
-      return 'Bin is Empty';
-    }
-  };
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Smart Garbage Bin</Text>
+      <Text style={styles.title}>Smart GarbageBin</Text>
       <View style={styles.binContainer}>
         {/* Dustbin with lid */}
         <View style={styles.dustbinContainer}>
@@ -46,7 +40,8 @@ const Dustbin = () => {
         {/* Text next to the bin */}
         <View style={styles.infoContainer}>
           <Text style={styles.levelText}>Garbage Level: {garbageLevel}%</Text>
-          <Text style={styles.statusText}>{getBinStatus()}</Text>
+          <Text style={styles.levelText}>Bin Depth: {binDepth} m</Text>
+          <Text style={styles.statusText}>Status: {binStatus}</Text>
         </View>
       </View>
     </View>
