@@ -39,7 +39,7 @@ const StorePage = ({ navigation }: any) => {
     return (
         <ScrollView style={styles.container}>
           <ImageBackground
-    source={{ uri: 'https://m.media-amazon.com/images/I/41san9tTmAL._AC_UF1000,1000_QL80_.jpg' }}   
+                    source={{ uri: 'https://img.freepik.com/free-photo/overhead-view-shovel-seedling-peat-pots-soil-dirty-wooden-bench_23-2148044449.jpg' }}
 >
     <View style={styles.overlay}>
         <Text style={styles.title}>Organic Fertilizer</Text>
