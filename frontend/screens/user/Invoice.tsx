@@ -1,9 +1,9 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
- 
-import { MaterialIcons } from '@expo/vector-icons'; // Import icons
-
+import * as Print from 'expo-print';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 
 type RouteParams = {
     params: {
@@ -11,21 +11,146 @@ type RouteParams = {
             name: string;
             phone: string;
             email: string;
-            amount: string;
+            amount: number; // Assuming amount is numeric
             date: string;
             time: string;
             urbanCouncil: string;
+            unitPrice: number; // Added unitPrice
         };
         invoiceNumber: string;
         totalPrice: number;
+        
     };
 };
 
 const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
- 
-    const { formData, invoiceNumber, totalPrice } = route.params; // Retrieve data passed via navigation
- 
- 
+    const { formData, invoiceNumber,totalPrice } = route.params; // Retrieve data passed via navigation
+    console.log('Total Price: ' ,totalPrice);
+    
+     
+    const generateReport = async () => {
+        const order = {
+            name: formData.name,
+            phone: formData.phone,
+            email: formData.email,
+            amount: formData.amount,
+            date: formData.date,
+            time: formData.time,
+            urbanCouncil: formData.urbanCouncil,
+            totalPrice: totalPrice,
+            invoiceNumber: invoiceNumber,
+        };
+
+        const htmlContent = `
+            <html>
+                <head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+                    <style>
+                        body {
+                            font-family: 'Helvetica';
+                            padding: 20px;
+                            background-color: #f8f8f8;
+                        }
+                        .receipt {
+                            background-color: #fff;
+                            padding: 20px;
+                            border-radius: 10px;
+                            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                        }
+                        h1 {
+                            text-align: center;
+                            fontcolor: #4CAF50;
+                            font-size: 30px;
+                        }
+                        .section {
+                            margin-bottom: 20px;
+                        }
+                        .section-title {
+                            font-size: 18px;
+                            font-weight: bold;
+                            margin-bottom: 10px;
+                        }
+                        .item {
+                            display: flex;
+                            justify-content: space-between;
+                            padding: 5px 0;
+                            font-size: 16px;
+                        }
+                        .footer {
+                            margin-top: 20px;
+                            text-align: center;
+                            font-size: 16px;
+                            color: #4b5563;
+                        }
+                        .thank-you {
+                            font-weight: bold;
+                            
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="receipt">
+                        <h1>Order Invoice</h1>
+                        <div class="section">
+                            <div class="section-title">Invoice Details</div>
+                            <div class="item"><span>Invoice #:</span><span>${order.invoiceNumber}</span></div>
+                            <div class="item"><span>Date:</span><span>${order.date}</span></div>
+                            <div class="item"><span>Time:</span><span>${order.time}</span></div>
+                        </div>
+                        <div class="section">
+                            <div class="section-title">Bill To:</div>
+                            <div class="item"><span>Name:</span><span>${order.name}</span></div>
+                            <div class="item"><span>Phone:</span><span>${order.phone}</span></div>
+                            <div class="item"><span>Email:</span><span>${order.email}</span></div>
+                            <div class="item"><span>Pickup Location:</span><span>${order.urbanCouncil}</span></div>
+                        </div>
+                        <div class="section">
+                            <div class="section-title">Order Details:</div>
+                            <div class="item"><span>Product Order:</span><span>${order.amount}</span></div>
+                        </div>
+                        <div class="section">
+                            <div class="item"><strong>Total Amount:</strong><strong>Rs ${order.totalPrice.toFixed(2)}</strong></div>
+                        </div>
+                        <div class="footer">
+                            <div class="thank-you">Thank you for your business!</div>
+                            <div>Please Collect Your Order from your Selected Urban Council.</div>
+                        </div>
+                    </div>
+                </body>
+            </html>
+        `;
+
+        try {
+            const { uri } = await Print.printToFileAsync({ html: htmlContent });
+            const fileName = 'OrderListReport.pdf';
+
+            if (Platform.OS === 'android') {
+                const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+                if (permissions.granted) {
+                    const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
+                    await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, fileName, 'application/pdf')
+                        .then(async (createdUri) => {
+                            await FileSystem.writeAsStringAsync(createdUri, base64, { encoding: FileSystem.EncodingType.Base64 });
+                            Alert.alert('Success', `Report downloaded to your device as ${fileName}`);
+                        })
+                        .catch((e) => {
+                            console.error(e);
+                            Alert.alert('Error', 'Failed to save the file.');
+                        });
+                } else {
+                    Alert.alert('Permission denied', 'Unable to save the file without permission.');
+                }
+            } else {
+                // For iOS and other platforms
+                await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+            }
+        } catch (error) {
+            console.error('Error generating PDF:', error);
+            Alert.alert('Error', 'Failed to generate and download PDF. Please try again.');
+        }
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.invoiceContainer}>
@@ -51,12 +176,12 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
                 <View style={styles.table}>
                     <View style={styles.tableHeader}>
                         <Text style={styles.tableHeaderText}>Description</Text>
-                        <Text style={styles.tableHeaderTextRight}>Quantity</Text>
+                        <Text style={styles.footerTextRight}>Quantity</Text>
                     </View>
 
                     <View style={styles.tableRow}>
                         <Text style={styles.text}>Product Order</Text>
-                        <Text style={styles.textRight}>{formData.amount}</Text>
+                        <Text style={styles.footerTextRight}>{formData.amount}</Text>
                     </View>
 
                     <View style={styles.tableFooter}>
@@ -65,149 +190,133 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
                     </View>
                 </View>
 
-                <Text style={styles.thankYouText}>Thank you for your business!</Text>
+                <Text style={styles.thankYouText}>Thank you for your Order!</Text>
                 <Text style={styles.smallText}>Please Collect Your Order from your Selected Urban Council.</Text>
 
-               
+                <TouchableOpacity style={styles.button} onPress={generateReport}>
+                    <Text style={styles.buttonText}>Download Invoice</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
 };
+
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: '#f8f8f8',
-    flexGrow: 1,
-  },
-  invoiceContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 2,
-    marginBottom: 20,
-  },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#1e40af',
-    marginBottom: 10,
-  },
-  divider: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginBottom: 10,
-  },
-  invoiceHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  titleText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  infoText: {
-    color: '#4b5563',
-    fontWeight: 'bold',
-  },
-  billToSection: {
-    marginBottom: 20,
-  },
-  subTitleText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  text: {
-    color: '#4b5563',
-    marginBottom: 5,
-  },
-  table: {
-    marginBottom: 20,
-  },
-  tableHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    paddingBottom: 10,
-  },
-  tableHeaderText: {
-    fontWeight: 'bold',
-    color: '#4b5563',
-  },
-  tableHeaderTextRight: {
-    fontWeight: 'bold',
-    color: '#4b5563',
-    textAlign: 'right',
-  },
-  tableRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 10,
-  },
-  textRight: {
-    color: '#4b5563',
-    textAlign: 'right',
-  },
-  tableFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    paddingTop: 10,
-  },
-  footerText: {
-    fontWeight: 'bold',
-    color: '#4b5563',
-  },
-  footerTextRight: {
-    fontWeight: 'bold',
-    color: '#4b5563',
-    textAlign: 'right',
-  },
-  thankYouText: {
-    color: '#4b5563',
-    marginBottom: 5,
-    textAlign: 'center',
-  },
-  smallText: {
-    color: '#6b7280',
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: '#fff',
-    marginTop: 20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  downloadButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#1e40af',
-    paddingVertical: 10,
-    borderRadius: 5,
-    marginTop: 20,
-},
-downloadButtonText: {
-    color: 'white',
-    fontSize: 16,
-    marginLeft: 5,
-},
+    container: {
+        padding: 20,
+        backgroundColor: '#f8f8f8',
+        flexGrow: 1,
+    },
+    invoiceContainer: {
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        borderColor:'#10b981',
+        padding: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.2,
+        shadowRadius: 10,
+        elevation: 5,
+    },
+    headerText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    divider: {
+        height: 1,
+        backgroundColor: '#10b981',
+        marginVertical: 10,
+    },
+    invoiceHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 10,
+        color:'#10b981',
+    },
+    titleText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    infoText: {
+        fontSize: 16,
+    },
+    billToSection: {
+        marginBottom: 10,
+    },
+    subTitleText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginTop: 10,
+        marginBottom: 5,
+    },
+    text: {
+        fontSize: 16,
+    },
+    table: {
+        marginVertical: 10,
+        borderWidth: 1,
+        borderColor: '#10b981',
+    },
+    tableHeader: {
+        backgroundColor: '#f1f1f1',
+        padding: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    tableHeaderText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    tableRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+    },
+    tableFooter: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 10,
+        borderTopWidth: 1,
+        borderTopColor: '#ccc',
+        backgroundColor: '#f9f9f9',
+    },
+    footerText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        padding: 10,
+    },
+    footerTextRight: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        padding: 10,
+    },
+    thankYouText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginVertical: 10,
+        marginTop: 25,
+        color:'#4CAF50',
+    },
+    smallText: {
+        fontSize: 14,
+        textAlign: 'center',
+        color: '#4b5563',
+    },
+    button: {
+        backgroundColor: '#4CAF50',
+        borderRadius: 5,
+        padding: 15,
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+    },
 });
 
 export default Invoice;
