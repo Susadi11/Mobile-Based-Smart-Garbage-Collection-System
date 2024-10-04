@@ -7,12 +7,19 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { app } from '../../firebaseConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { setDoc, doc } from 'firebase/firestore';
 
 type RootStackParamList = {
   ComplainRead: { complaintId: string };
 };
 
 type FormNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ComplainRead'>;
+const generateComplaintId = () => {
+  // Create a unique Complaint ID based on date-time and random number
+  const timestamp = new Date().getTime(); // Get current time in milliseconds
+  const randomNumber = Math.floor(Math.random() * 100); // Generate a random number
+  return `COMP${timestamp}${randomNumber}`; // Custom ID format: COMP + timestamp + random number
+};
 
 const Form: React.FC = () => {
   const navigation = useNavigation<FormNavigationProp>();
@@ -68,38 +75,29 @@ const Form: React.FC = () => {
     const mobileRegex = /^[0-9]{10}$/; // Example: Only allows 10 digits
     return mobileRegex.test(number);
   };
-
   const handleSubmit = async () => {
-    // Validate First Name
+    // Validate fields before submission (same as before)
     if (!firstName.trim()) {
       Alert.alert('Error', 'First name is required.');
       return;
     }
-
-    // Validate Last Name
     if (!lastName.trim()) {
       Alert.alert('Error', 'Last name is required.');
       return;
     }
-
-    // Validate Mobile Number
     if (!validateMobileNumber(mobileNumber)) {
       Alert.alert('Error', 'Please enter a valid 10-digit mobile number.');
       return;
     }
-
-    // Validate Email
     if (!validateEmail(email)) {
       Alert.alert('Error', 'Please enter a valid email address.');
       return;
     }
-
-    // Validate Problem Description
     if (!problem.trim()) {
       Alert.alert('Error', 'Please describe your problem.');
       return;
     }
-
+  
     const formData = {
       firstName,
       lastName,
@@ -110,14 +108,16 @@ const Form: React.FC = () => {
       date,
       time,
     };
-
+  
+    const customComplaintId = generateComplaintId(); // Generate a custom Complaint ID
+  
     try {
-      const docRef = await addDoc(collection(firestore, 'complaints'), formData);
-      const complaintId = docRef.id;
-
+      // Store complaint with custom ID in Firestore
+      await setDoc(doc(firestore, 'complaints', customComplaintId), formData);
+  
       Alert.alert('Success', 'Complaint submitted successfully!');
-      navigation.navigate('ComplainRead', { complaintId });
-
+      navigation.navigate('ComplainRead', { complaintId: customComplaintId });
+  
       // Clear form fields after submission
       setFirstName('');
       setLastName('');
