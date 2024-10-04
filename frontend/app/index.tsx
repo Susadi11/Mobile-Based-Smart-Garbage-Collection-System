@@ -1,39 +1,42 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { NavigationContainer } from '@react-navigation/native';
 import { Provider as PaperProvider, DefaultTheme } from 'react-native-paper';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
-import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter'; 
+import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
+import { onAuthStateChanged, User } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
 
 // Import your screens here
-import HomePage from '@/screens/user/HomePage';
-import BulkPage from '@/screens/user/BulkPage';
-import StorePage from '@/screens/user/StorePage';
-import ComplainPage from '@/screens/user/ComplainPage';
-import HomeDash from '@/screens/admin/HomeDash';
-import ComplainDash from '@/screens/admin/ComplainDash';
-import StoreDash from '@/screens/admin/StoreDash';
-import Map from '@/screens/admin/Map';
-import WelcomePage from '@/screens/WelcomePage';
-import AddBulkPage from '@/screens/user/AddBulkPage';
-import AddProduct from '@/screens/admin/AddProduct';
-import PlaceOrder from '@/screens/user/PlaceOrder';
-import Invoice from '@/screens/user/Invoice'; 
-import OrderList from '@/screens/admin/OrderList'; 
-import UpdateProduct from '@/screens/admin/UpdateProduct';
-import AddComplaint from '@/screens/user/AddComplaint';
-import ComplainRead from '@/screens/user/ComplainRead';
-import AllComplaints from '@/screens/admin/AllComplaints';
-import PendingComplaints from '@/screens/admin/PendingComplaints';
-import BulkSchedules from '@/components/Admin/Bulk/BulkSchedules';
-import ProfilePage from '@/screens/Profile';
-import NormalSchedules from '@/components/Admin/Bulk/NormalSchedules';
-import ComplaintPending from '@/screens/admin/ComplaintPending';
-import ComplaintResolve from '@/screens/admin/ComplaintResolve';
-import ComplaintProcessing from '@/screens/admin/ComplaintProcessing';
+import LoginScreen from '../screens/LoginScreen';
+import SignupScreen from '../screens/SignupScreen';
+import HomePage from '../screens/user/HomePage';
+import BulkPage from '../screens/user/BulkPage';
+import StorePage from '../screens/user/StorePage';
+import ComplainPage from '../screens/user/ComplainPage';
+import HomeDash from '../screens/admin/HomeDash';
+import ComplainDash from '../screens/admin/ComplainDash';
+import StoreDash from '../screens/admin/StoreDash';
+import Map from '../screens/admin/Map';
+import AddBulkPage from '../screens/user/AddBulkPage';
+import AddProduct from '../screens/admin/AddProduct';
+import PlaceOrder from '../screens/user/PlaceOrder';
+import Invoice from '../screens/user/Invoice';
+import OrderList from '../screens/admin/OrderList';
+import UpdateProduct from '../screens/admin/UpdateProduct';
+import AddComplaint from '../screens/user/AddComplaint';
+import ComplainRead from '../screens/user/ComplainRead';
+import AllComplaints from '../screens/admin/AllComplaints';
+import PendingComplaints from '../screens/admin/PendingComplaints';
+import BulkSchedules from '../components/Admin/Bulk/BulkSchedules';
+import ProfilePage from '../screens/Profile';
+import NormalSchedules from '../components/Admin/Bulk/NormalSchedules';
+import ComplaintPending from '../screens/admin/ComplaintPending';
+import ComplaintResolve from '../screens/admin/ComplaintResolve';
+import ComplaintProcessing from '../screens/admin/ComplaintProcessing';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -146,6 +149,9 @@ const UserTabs: React.FC = () => (
 );
 
 const App: React.FC = () => {
+  const [user, setUser] = useState<User | null>(null);
+  const [initializing, setInitializing] = useState(true);
+
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -153,27 +159,38 @@ const App: React.FC = () => {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      if (initializing) setInitializing(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded && !initializing) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, initializing]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded || initializing) {
     return null;
   }
 
   return (
- 
     <PaperProvider theme={theme}>
-        <Stack.Navigator 
-          initialRouteName="Welcome" 
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen name="Welcome" component={WelcomePage} />
-          <Stack.Screen name="AdminTabs" component={AdminTabs} />
-          <Stack.Screen name="UserTabs" component={UserTabs} />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {!user ? (
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Signup" component={SignupScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="AdminTabs" component={AdminTabs} />
+              <Stack.Screen name="UserTabs" component={UserTabs} />
+            </>
+          )}
           <Stack.Screen name="AddBulkPage" component={AddBulkPage} />
           <Stack.Screen name="AddComplaint" component={AddComplaint} />
           <Stack.Screen name="ComplainRead" component={ComplainRead} />
@@ -183,14 +200,12 @@ const App: React.FC = () => {
           <Stack.Screen name="ComplaintProcessing" component={ComplaintProcessing} />
           <Stack.Screen name="AddProduct" component={AddProduct} />
           <Stack.Screen name="PlaceOrder" component={PlaceOrder} />
-          <Stack.Screen name="StoreDash" component={StoreDash} />
           <Stack.Screen name="UpdateProduct" component={UpdateProduct} />
           <Stack.Screen name="BulkSchedules" component={BulkSchedules} />
           <Stack.Screen name="NormalSchedules" component={NormalSchedules} />
           <Stack.Screen name="ProfilePage" component={ProfilePage} />
           <Stack.Screen name="Invoice" component={Invoice} />
           <Stack.Screen name="OrderList" component={OrderList} />
- 
         </Stack.Navigator>
     </PaperProvider>
   );

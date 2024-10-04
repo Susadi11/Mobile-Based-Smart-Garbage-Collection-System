@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getFirestore, collection, getDocs, query, where } from 'firebase/firestore';
 import { app } from '../../../firebaseConfig'; // Adjust the path as needed
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type RootStackParamList = {
   Home: undefined;
@@ -13,6 +14,7 @@ type RootStackParamList = {
   NormalSchedules: undefined;
   AllComplaints: undefined;
   Analytics: undefined;
+  ProfilePage: undefined;
   // Add other screens here
 };
 
@@ -136,7 +138,12 @@ const HomeAd = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.pageTitle}>Dashboard</Text>
+      <View style={styles.header}>
+          <Text style={styles.pageTitle}>Dashboard</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('ProfilePage')} style={styles.profileIcon}>
+          <Ionicons name="person-circle-outline" size={30} color="black" /> 
+        </TouchableOpacity>
+        </View>
 
       {/* Card 1 with Chart */}
       <View style={styles.card}>
@@ -217,6 +224,12 @@ const styles = StyleSheet.create({
     padding: 16,
     flexGrow: 1,
     backgroundColor: '#f8f9fa',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 24,
   },
   pageTitle: {
     fontSize: 28,
@@ -311,6 +324,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#343a40',
     marginTop: 8,
+  },
+  profileIcon: {
+    padding: 8,
   },
 });
 

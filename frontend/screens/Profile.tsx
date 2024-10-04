@@ -1,12 +1,35 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Switch, TextInput, Alert, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { auth } from '../firebaseConfig'; // Import Firebase auth
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-const ProfilePage: React.FC = () => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+type RootStackParamList = {
+  Login: undefined;
+};
+
+type ProfilePageNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Login'>;
+
+type Props = {
+  navigation: ProfilePageNavigationProp;
+};
+
+const ProfilePage: React.FC<Props> = ({ navigation }) => {
   const [newPassword, setNewPassword] = useState('');
+  const [user, setUser] = useState<any>(null);
 
-  const toggleDarkMode = () => setIsDarkMode(previousState => !previousState);
+  // Fetch the current user data from Firebase
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
+      } else {
+        setUser(null); // User is logged out
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handlePasswordReset = () => {
     if (newPassword.length < 6) {
@@ -18,19 +41,36 @@ const ProfilePage: React.FC = () => {
     setNewPassword('');
   };
 
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      navigation.navigate('Login'); // Navigate to login screen after logout
+    } catch (error) {
+      Alert.alert('Error', 'Failed to log out');
+    }
+  };
+
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>No user logged in</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
+    <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => console.log('Back pressed')}>
-          <Icon name="arrow-left" size={24} color={isDarkMode ? '#e5e7eb' : '#1f2937'} />
+          <Icon name="arrow-left" size={24} color="#1f2937" />
         </TouchableOpacity>
-        <Text style={[styles.title, isDarkMode && styles.darkText]}>Profile</Text>
+        <Text style={styles.title}>Profile</Text>
       </View>
 
       <View style={styles.card}>
         <View style={styles.photoContainer}>
           <Image
-            source={{ uri: 'https://via.placeholder.com/150' }} // Replace with the actual user photo URL
+            source={{ uri: user.photoURL || 'https://via.placeholder.com/150' }} // Replace with the actual user photo URL
             style={styles.profilePhoto}
           />
           <TouchableOpacity style={styles.editPhotoButton}>
@@ -39,31 +79,21 @@ const ProfilePage: React.FC = () => {
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={[styles.label, isDarkMode && styles.darkText]}>Name</Text>
-          <Text style={[styles.info, isDarkMode && styles.darkText]}>John Doe</Text>
+          <Text style={styles.label}>Name</Text>
+          <Text style={styles.info}>{user.displayName || 'No name provided'}</Text>
         </View>
 
         <View style={styles.infoContainer}>
-          <Text style={[styles.label, isDarkMode && styles.darkText]}>Email</Text>
-          <Text style={[styles.info, isDarkMode && styles.darkText]}>johndoe@example.com</Text>
-        </View>
-
-        <View style={styles.infoContainer}>
-          <Text style={[styles.label, isDarkMode && styles.darkText]}>Dark Mode</Text>
-          <Switch
-            trackColor={{ false: "#cbd5e1", true: "#3b82f6" }}
-            thumbColor={isDarkMode ? "#f3f4f6" : "#ffffff"}
-            onValueChange={toggleDarkMode}
-            value={isDarkMode}
-          />
+          <Text style={styles.label}>Email</Text>
+          <Text style={styles.info}>{user.email}</Text>
         </View>
 
         <View style={styles.passwordResetContainer}>
-          <Text style={[styles.label, isDarkMode && styles.darkText]}>Reset Password</Text>
+          <Text style={styles.label}>Reset Password</Text>
           <TextInput
-            style={[styles.input, isDarkMode && styles.darkInput]}
+            style={styles.input}
             placeholder="Enter new password"
-            placeholderTextColor={isDarkMode ? "#9ca3af" : "#6b7280"}
+            placeholderTextColor="#6b7280"
             secureTextEntry
             value={newPassword}
             onChangeText={setNewPassword}
@@ -72,6 +102,10 @@ const ProfilePage: React.FC = () => {
             <Text style={styles.resetButtonText}>Reset Password</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutButtonText}>Log Out</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -82,9 +116,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f9fafb',
-  },
-  darkContainer: {
-    backgroundColor: '#1f2937',
   },
   header: {
     flexDirection: 'row',
@@ -174,13 +205,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  darkText: {
-    color: '#e5e7eb',
+  logoutButton: {
+    backgroundColor: '#ef4444',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 24,
   },
-  darkInput: {
-    backgroundColor: '#374151',
-    borderColor: '#4b5563',
-    color: '#e5e7eb',
+  logoutButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
