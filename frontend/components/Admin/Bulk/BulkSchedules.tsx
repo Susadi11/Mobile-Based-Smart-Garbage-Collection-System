@@ -7,6 +7,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 type RootStackParamList = {
   BulkSchedules: undefined;
@@ -44,6 +45,12 @@ const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const firestore = getFirestore(app);
+
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -182,6 +189,10 @@ const BulkSchedules = ({ navigation }: BulkSchedulesProps) => {
     );
   }
 
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -248,6 +259,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 10,
     color: 'black',
+    fontFamily: 'Inter_700Bold',
   },
   searchBar: {
     backgroundColor: 'white',
@@ -256,6 +268,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderColor: '#d1d5db',
     borderWidth: 1,
+    fontFamily: 'Inter_500Medium',
   },
   button: {
     backgroundColor: '#047857',
@@ -268,6 +281,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   scheduleItem: {
     backgroundColor: '#fff',
@@ -288,16 +302,19 @@ const styles = StyleSheet.create({
     color: '#047857',
     textTransform: 'uppercase',
     marginBottom: 8,
+    fontFamily: 'Inter_600SemiBold',
   },
   scheduleDate: {
     fontSize: 14,
     color: 'black',
     marginBottom: 8,
+    fontFamily: 'Inter_600SemiBold',
   },
   scheduleDetails: {
     fontSize: 14,
     color: '#374151',
     marginBottom: 8,
+    fontFamily: 'Inter_600SemiBold',
   },
   checkboxContainer: {
     flexDirection: 'row',

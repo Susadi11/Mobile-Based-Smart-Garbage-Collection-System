@@ -7,6 +7,7 @@ import { getFirestore, collection, getDocs, query, where } from 'firebase/firest
 import { app } from '../../../firebaseConfig'; // Adjust the path as needed
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 type RootStackParamList = {
   Home: undefined;
@@ -24,6 +25,12 @@ const HomeAd = () => {
   const [pendingComplaints, setPendingComplaints] = useState<number>(0);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const firestore = getFirestore(app);
+
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -136,6 +143,10 @@ const HomeAd = () => {
     }
   };
 
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
@@ -237,6 +248,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     color: '#343a40',
+    fontFamily: 'Inter_700Bold',
   },
   card: {
     backgroundColor: '#fff',
@@ -260,18 +272,21 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     textAlign: 'center',
     color: '#343a40',
+    fontFamily: 'Inter_600SemiBold',
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     marginTop: 12,
     color: '#343a40',
+    fontFamily: 'Inter_600SemiBold',
   },
   description: {
     fontSize: 14,
     color: '#6c757d',
     marginTop: 8,
     textAlign: 'center',
+    fontFamily: 'Inter_600SemiBold',
   },
   navigationContainer: {
     flexDirection: 'row',
@@ -307,6 +322,7 @@ const styles = StyleSheet.create({
     color: '#6c757d',
     textAlign: 'center',
     marginBottom: 12,
+    fontFamily: 'Inter_600SemiBold',
   },
   row: {
     flexDirection: 'row',
@@ -324,6 +340,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#343a40',
     marginTop: 8,
+    fontFamily: 'Inter_600SemiBold',
   },
   profileIcon: {
     padding: 8,
