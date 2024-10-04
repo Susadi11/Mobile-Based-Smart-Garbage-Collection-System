@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingHorizontal: 10,
         paddingVertical: 8,
-        fontSize: 16, // Increase font size to make the cursor larger
+        fontSize: 14, // Increase font size to make the cursor larger
         color: '#333',
         height: 40, // Adjust height for better visibility
         fontFamily: 'Inter_400Regular',

@@ -217,6 +217,7 @@ const styles = StyleSheet.create({
   container: {
     padding: 10,
     backgroundColor: '#f3f4f6',
+    fontFamily: 'Inter_400Regular',
   },
   loadingContainer: {
     flex: 1,
@@ -245,6 +246,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    fontFamily: 'Inter_400Regular',
   },
   orderItem: {
     backgroundColor: '#fff',
@@ -265,11 +267,14 @@ const styles = StyleSheet.create({
     color: '#047857',
     textTransform: 'uppercase',
     marginBottom: 8,
+    
   },
   orderDetails: {
     fontSize: 14,
     color: '#374151',
     marginBottom: 8,
+    fontFamily: 'Inter_400Regular',
+
   },
  });
 export default OrderList;
