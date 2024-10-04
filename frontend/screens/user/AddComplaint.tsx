@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { View,Text,TouchableOpacity,StyleSheet, ScrollView} from 'react-native';
 import Form from '@/components/vindi/Form';
-import Navbar from '@/components/vindi/ListNavBar';
-import ListNavbar from '@/components/vindi/ListNavBar';
+
 
 const AddComplaint: React.FC =() => {
 
@@ -11,11 +10,8 @@ const AddComplaint: React.FC =() => {
         
         
         <View style={styles.container}>
-        <View style={styles.header}>
-        <Text style={styles.headerTitle}>Add Complaint</Text>
-      </View>
-
-          <ListNavbar/>
+       
+       
             
                 <Form/>
             
@@ -30,12 +26,13 @@ const AddComplaint: React.FC =() => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flex: 0,
         
         
         
     
     },
+    
     title: {
         marginTop: 30,
         color: 'black',
@@ -44,25 +41,27 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 2,
     },
+    
     scrollContent: {
-        alignItems: 'center',
+      
         paddingVertical: 10,
       },
       header: {
-        width: 450,
-        height: 60,
-        backgroundColor: 'white',
+        width: '100%',
+        height: 80,
+        backgroundColor: '#4CAF50',
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 4,
+        
       },
       
     
       headerTitle: {
         fontSize: 25,
-        color: 'black',
+        color: 'white',
         fontWeight:'bold',
-        marginRight:58,
+       
       },
 
 

@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
@@ -25,9 +26,10 @@ type RouteParams = {
 
 const Invoice = ({ route, navigation }: { route: RouteProp<RouteParams, 'params'>, navigation: any }) => {
     const { formData, invoiceNumber,totalPrice } = route.params; // Retrieve data passed via navigation
-    console.log('Total Price: ' ,totalPrice);
+ 
     
-     
+    
+   
     const generateReport = async () => {
         const order = {
             name: formData.name,
@@ -59,8 +61,7 @@ const Invoice = ({ route, navigation }: { route: RouteProp<RouteParams, 'params'
                         }
                         h1 {
                             text-align: center;
-                            fontcolor: #4CAF50;
-                            font-size: 30px;
+ 
                         }
                         .section {
                             margin-bottom: 20px;
@@ -75,6 +76,7 @@ const Invoice = ({ route, navigation }: { route: RouteProp<RouteParams, 'params'
                             justify-content: space-between;
                             padding: 5px 0;
                             font-size: 16px;
+ 
                         }
                         .footer {
                             margin-top: 20px;
@@ -84,13 +86,15 @@ const Invoice = ({ route, navigation }: { route: RouteProp<RouteParams, 'params'
                         }
                         .thank-you {
                             font-weight: bold;
-                            
+ 
                         }
                     </style>
                 </head>
                 <body>
                     <div class="receipt">
+ 
                         <h1>Order Invoice</h1>
+ 
                         <div class="section">
                             <div class="section-title">Invoice Details</div>
                             <div class="item"><span>Invoice #:</span><span>${order.invoiceNumber}</span></div>

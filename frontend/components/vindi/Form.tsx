@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, ScrollView } from 'react-native';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
-import MapView, { Marker } from 'react-native-maps'; // Import MapView and Marker
+import MapView, { Marker } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { app } from '../../firebaseConfig'; // Ensure the path is correct based on your project structure
+import { app } from '../../firebaseConfig';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 type RootStackParamList = {
-  ComplainRead: { complaintId: string }; // Pass complaintId instead of entire data
-  // other routes...
+  ComplainRead: { complaintId: string };
 };
 
 type FormNavigationProp = NativeStackNavigationProp<RootStackParamList, 'ComplainRead'>;
@@ -22,24 +22,23 @@ const Form: React.FC = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [email, setEmail] = useState('');
   const [problem, setProblem] = useState('');
-  const [location, setLocation] = useState<{ latitude: number, longitude: number }>({ latitude: 6.9271, longitude: 79.8612 }); // Default to Colombo
+  const [location, setLocation] = useState<{ latitude: number, longitude: number }>({ latitude: 6.9271, longitude: 79.8612 });
   const [region, setRegion] = useState({
     latitude: 6.9271,
     longitude: 79.8612,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
-  const [date, setDate] = useState(''); // State to store date
-  const [time, setTime] = useState(''); // State to store time
+  const [date, setDate] = useState('');
+  const [time, setTime] = useState('');
 
   const firestore = getFirestore(app);
 
   useEffect(() => {
     const currentDate = new Date();
-    setDate(currentDate.toLocaleDateString()); // Format date as needed
-    setTime(currentDate.toLocaleTimeString()); // Format time as needed
+    setDate(currentDate.toLocaleDateString());
+    setTime(currentDate.toLocaleTimeString());
 
-    // Request location permission
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -60,10 +59,44 @@ const Form: React.FC = () => {
     setLocation(coordinate);
   };
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateMobileNumber = (number: string) => {
+    const mobileRegex = /^[0-9]{10}$/; // Example: Only allows 10 digits
+    return mobileRegex.test(number);
+  };
+
   const handleSubmit = async () => {
-    // Basic form validation
-    if (!firstName || !lastName || !mobileNumber || !email || !location || !problem) {
-      Alert.alert('Error', 'Please fill in all fields.');
+    // Validate First Name
+    if (!firstName.trim()) {
+      Alert.alert('Error', 'First name is required.');
+      return;
+    }
+
+    // Validate Last Name
+    if (!lastName.trim()) {
+      Alert.alert('Error', 'Last name is required.');
+      return;
+    }
+
+    // Validate Mobile Number
+    if (!validateMobileNumber(mobileNumber)) {
+      Alert.alert('Error', 'Please enter a valid 10-digit mobile number.');
+      return;
+    }
+
+    // Validate Email
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email address.');
+      return;
+    }
+
+    // Validate Problem Description
+    if (!problem.trim()) {
+      Alert.alert('Error', 'Please describe your problem.');
       return;
     }
 
@@ -74,19 +107,18 @@ const Form: React.FC = () => {
       email,
       location,
       problem,
-      date, // Include the date
-      time, // Include the time
+      date,
+      time,
     };
 
     try {
-      // Save form data to Firestore
       const docRef = await addDoc(collection(firestore, 'complaints'), formData);
-      const complaintId = docRef.id; // Get the document ID
+      const complaintId = docRef.id;
 
       Alert.alert('Success', 'Complaint submitted successfully!');
       navigation.navigate('ComplainRead', { complaintId });
 
-      // Reset form fields
+      // Clear form fields after submission
       setFirstName('');
       setLastName('');
       setMobileNumber('');
@@ -98,55 +130,68 @@ const Form: React.FC = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView>
       <View style={styles.form}>
+        <Text style={styles.text}>Complaint Form</Text>
+        <Text style={styles.headerText}>Please complete this form and one of our agents will resolve your problem as soon as possible.</Text>
+       
+
+       
+
         <View style={styles.inputGroup}>
-          
-          {/* Display Current Date and Time */}
-        <Text style={styles.dateTimeText}>Current Date: {date}</Text>
-        <Text style={styles.dateTimeText}>Current Time: {time}</Text>
-          <Text style={styles.label}>First Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="John"
-            value={firstName}
-            onChangeText={setFirstName}
-          />
+        <Text style={styles.label}>First Name:</Text>
+          <View style={styles.inputContainer}>
+            <Icon name="person" size={20} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              value={firstName}
+              onChangeText={setFirstName}
+            />
+          </View>
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Last Name</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Doe"
-            value={lastName}
-            onChangeText={setLastName}
-          />
+        <Text style={styles.label}>Last Name:</Text>
+          <View style={styles.inputContainer}>
+            <Icon name="person-outline" size={20} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              value={lastName}
+              onChangeText={setLastName}
+            />
+          </View>
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Mobile Number</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="0771234567"
-            value={mobileNumber}
-            keyboardType="phone-pad"
-            onChangeText={setMobileNumber}
-          />
+        <Text style={styles.label}>Mobile:</Text>
+          <View style={styles.inputContainer}>
+            <Icon name="phone" size={20} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Mobile Number"
+              value={mobileNumber}
+              keyboardType="phone-pad"
+              onChangeText={setMobileNumber}
+            />
+          </View>
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="example@mail.com"
-            value={email}
-            keyboardType="email-address"
-            onChangeText={setEmail}
-          />
+        <Text style={styles.label}>Email:</Text>
+          <View style={styles.inputContainer}>
+            <Icon name="email" size={20} style={styles.icon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              keyboardType="email-address"
+              onChangeText={setEmail}
+            />
+          </View>
         </View>
 
-        {/* Map View */}
         <View style={styles.mapContainer}>
           <Text style={styles.label}>Select Your Location</Text>
           <MapView
@@ -162,15 +207,18 @@ const Form: React.FC = () => {
           <Text style={styles.label}>Describe Your Problem</Text>
           <TextInput
             style={[styles.input, styles.textArea]}
-            placeholder="Explain the issue"
             value={problem}
             multiline
             numberOfLines={4}
             onChangeText={setProblem}
           />
         </View>
+        <View style={styles.dateTimeContainer}>
+          <Text style={styles.dateTimeText}>Current Date: {date}</Text>
+          <Text style={styles.dateTimeText}> | </Text>
+          <Text style={styles.dateTimeText}>Current Time: {time}</Text>
+        </View>
 
-       
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Submit Complaint</Text>
         </TouchableOpacity>
@@ -180,13 +228,6 @@ const Form: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'white',
-  },
   form: {
     width: '100%',
     maxWidth: 450,
@@ -200,29 +241,57 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
+  headerText: {
+    fontSize: 16,
+    fontStyle: 'italic',
+    marginBottom: 20,
+    color: '#4a5568',
+    textAlign: 'center',
+ 
+  },
   inputGroup: {
+    marginBottom: 10,
+  },
+  text: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    marginStart: 75,
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
     color: '#4a5568',
-    marginBottom: 5,
-    marginTop:5,
+    marginBottom: 4,
+    marginTop: 0,
   },
-  
-  input: {
-    height: 50,
-    borderColor: '#cbd5e0',
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderColor: '#34495e',
     borderWidth: 1,
     borderRadius: 12,
     backgroundColor: '#edf2f7',
     paddingHorizontal: 15,
+    
+  },
+  
+  icon: {
+    marginRight: 10,
+    color: '#4a5568', // Icon color
+  },
+  input: {
+    flex: 2,
+    height: 50,
     fontSize: 16,
   },
   textArea: {
     height: 100,
     textAlignVertical: 'top',
+    borderColor: '#34495e',
+    borderWidth: 1,
+    borderRadius: 12,
+    backgroundColor: '#edf2f7',
   },
   mapContainer: {
     height: 300,
@@ -231,12 +300,14 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 15,
+  },
   dateTimeText: {
-    fontSize: 16,
-    marginVertical: 5,
+    fontSize: 14,
     color: '#4a5568',
-    fontWeight:'bold',
-    marginBottom:10,
   },
   button: {
     backgroundColor: '#4CAF50',
@@ -250,8 +321,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  
-  
 });
 
 export default Form;
