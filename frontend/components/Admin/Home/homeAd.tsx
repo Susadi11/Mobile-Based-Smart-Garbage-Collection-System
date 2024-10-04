@@ -345,6 +345,7 @@ const styles = StyleSheet.create({
   profileIcon: {
     padding: 8,
   },
+  
 });
 
 export default HomeAd;

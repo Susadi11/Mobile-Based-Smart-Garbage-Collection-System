@@ -337,6 +337,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontFamily: 'Inter_600SemiBold',
   },
+  
 });
 
 export default NormalSchedules;

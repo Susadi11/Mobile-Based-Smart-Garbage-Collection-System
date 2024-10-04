@@ -333,6 +333,7 @@ const styles = StyleSheet.create({
   checkboxChecked: {
     backgroundColor: '#047857',
   },
+  
 });
 
 export default BulkSchedules;
