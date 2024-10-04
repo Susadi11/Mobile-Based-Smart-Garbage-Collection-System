@@ -9,6 +9,7 @@ import { app } from '../../firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import Ionicons from 'react-native-vector-icons/Ionicons'; 
 
 type RootStackParamList = {
   BulkPage: undefined;
@@ -148,7 +149,14 @@ const Bulk: React.FC<BulkProps> = ({ existingTransaction, onAddComplete, onUpdat
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>{existingTransaction ? 'Update Waste Scheduling' : 'New Waste Scheduling'}</Text>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity onPress={() => navigation.navigate('BulkPage')}>
+          <Ionicons name="arrow-back-outline" size={24} color="#000000" />
+        </TouchableOpacity>
+        <Text style={styles.heading}>
+          {existingTransaction ? 'Update Waste Scheduling' : 'New Waste Scheduling'}
+        </Text>
+      </View>
       <Input
         placeholder="Enter your name"
         value={name}
@@ -267,8 +275,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginVertical: 16,
-    color: '#047857', 
+    color: '#4CAF50', 
     fontFamily: 'Inter_700Bold',
+    marginLeft: 16,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
   label: {
     fontSize: 16,
@@ -320,14 +334,14 @@ const styles = StyleSheet.create({
     borderRadius: 10, 
   },
   button: {
-    backgroundColor: '#10b981', // bg-green-500
+    backgroundColor: '#4CAF50', // bg-green-500
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 10, 
     marginBottom: 12,
   },
   buttonActive: {
-    backgroundColor: '#059669', // bg-green-600
+    backgroundColor: '#4CAF50', // bg-green-600
   },
   buttonText: {
     color: '#ffffff',
@@ -337,7 +351,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_600SemiBold',
   },
   submitButton: {
-    backgroundColor: '#059669', // bg-green-600
+    backgroundColor: '#4CAF50', // bg-green-600
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderRadius: 10, // Rounded corners
@@ -360,8 +374,9 @@ const pickerSelectStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#d1d5db', // border-gray-300
     borderRadius: 10, // Rounded corners
-    color: '#4b5563', // text-gray-600
+    color: '#000000', // text-gray-600
     backgroundColor: '#ffffff',
+    fontFamily: 'Inter_600SemiBold',
   },
   inputAndroid: {
     fontSize: 16,
@@ -369,9 +384,10 @@ const pickerSelectStyles = StyleSheet.create({
     paddingVertical: 10,
     borderWidth: 1,
     borderColor: '#d1d5db', // border-gray-300
-    borderRadius: 10, // Rounded corners
-    color: '#4b5563', // text-gray-600
+    borderRadius: 20, // Rounded corners
+    color: '#000000', // text-gray-600
     backgroundColor: '#ffffff',
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 

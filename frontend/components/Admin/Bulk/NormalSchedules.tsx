@@ -206,12 +206,16 @@ const NormalSchedules = ({ navigation }: NormalSchedulesProps) => {
         <Text style={styles.pageTitle}>Normal Schedules</Text>
       </View>
 
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search schedules..."
-        value={searchQuery}
-        onChangeText={handleSearch}
-      />
+      <View style={styles.searchContainer}>
+  <Ionicons name="search" size={20} color="#6b7280" style={styles.searchIcon} />
+  <TextInput
+    style={styles.searchBar}
+    placeholder="Search schedules..."
+    value={searchQuery}
+    onChangeText={handleSearch}
+  />
+</View>
+
 
       <TouchableOpacity style={styles.button} onPress={generateReport}>
         <Text style={styles.buttonText}>Generate Report</Text>
@@ -227,7 +231,6 @@ const NormalSchedules = ({ navigation }: NormalSchedulesProps) => {
             <Text style={styles.scheduleDetails}>Garbage Types: {item.garbageTypes}</Text>
             <Text style={styles.scheduleDetails}>Pickup Time: {item.pickupTime}</Text>
             {item.weight && <Text style={styles.scheduleDetails}>Weight: {item.weight} kg</Text>}
-            <Text style={styles.scheduleDetails}>Location: ({item.location.latitude}, {item.location.longitude})</Text>
             <View style={styles.checkboxContainer}>
               <Text>Complete:</Text>
               <CustomCheckbox
@@ -265,14 +268,25 @@ const styles = StyleSheet.create({
     color: 'black',
     fontFamily: 'Inter_700Bold',
   },
-  searchBar: {
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: 'white',
-    padding: 10,
+    paddingHorizontal: 20,
     borderRadius: 20,
     marginBottom: 16,
     borderColor: '#d1d5db',
     borderWidth: 1,
+    marginLeft:10,
+    marginRight:10,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchBar: {
+    flex: 1,
     fontFamily: 'Inter_500Medium',
+    paddingVertical: 8,
   },
   scheduleItem: {
     backgroundColor: '#fff',
@@ -330,6 +344,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginVertical: 16,
     alignItems: 'center',
+    marginLeft:10,
+    marginRight:10,
   },
   buttonText: {
     color: '#fff',

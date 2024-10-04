@@ -7,6 +7,7 @@ import { app } from '../../firebaseConfig';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import GarbageBin from "@/components/User/GarbageBin"
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -136,7 +137,7 @@ const HomeUs: React.FC = () => {
         <View style={styles.header}>
           <Text style={styles.title}>Welcome to Ecolife</Text>
           <TouchableOpacity onPress={() => navigateToPage('ProfilePage')} style={styles.profileIcon}>
-            <Icon name="user-circle" size={28} color="#4b5563" />
+          <Ionicons name="person-circle-outline" size={30} color="black" /> 
           </TouchableOpacity>
         </View>
         

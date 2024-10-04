@@ -69,10 +69,10 @@ const ProfilePage: React.FC<Props> = ({ navigation }) => {
 
       <View style={styles.card}>
         <View style={styles.photoContainer}>
-          <Image
-            source={{ uri: user.photoURL || 'https://via.placeholder.com/150' }} // Replace with the actual user photo URL
-            style={styles.profilePhoto}
-          />
+        <Image
+            source={user.photoURL ? { uri: user.photoURL } : require('../assets/images/man.png')} // Load local image if user doesn't have a photo
+          style={styles.profilePhoto}/>
+
           <TouchableOpacity style={styles.editPhotoButton}>
             <Icon name="camera" size={16} color="#ffffff" />
           </TouchableOpacity>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#f9fafb', // ash background
   },
   header: {
     flexDirection: 'row',
@@ -125,12 +125,12 @@ const styles = StyleSheet.create({
   backButton: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#f3f4f6', // light ash background
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1f2937',
+    color: '#1f2937', // dark gray for text
     marginLeft: 16,
   },
   card: {
@@ -152,13 +152,13 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 4,
-    borderColor: '#3b82f6',
+    borderColor: '#4CAF50', // green border for profile photo
   },
   editPhotoButton: {
     position: 'absolute',
     right: 0,
     bottom: 0,
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#4CAF50', // green for the camera button
     borderRadius: 20,
     width: 40,
     height: 40,
@@ -171,30 +171,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: '#e5e7eb', // light ash border
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#4b5563',
+    color: '#4b5563', // darker ash for labels
   },
   info: {
     fontSize: 16,
-    color: '#1f2937',
+    color: '#1f2937', // dark gray for info text
   },
   passwordResetContainer: {
     marginTop: 24,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#d1d5db', // light ash border for input
     borderRadius: 8,
     padding: 12,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#f9fafb', // ash background for input
     marginVertical: 8,
   },
   resetButton: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#4CAF50', // green for reset button
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   logoutButton: {
-    backgroundColor: '#ef4444',
+    backgroundColor: '#ef4444', // red for logout button
     padding: 12,
     borderRadius: 8,
     alignItems: 'center',

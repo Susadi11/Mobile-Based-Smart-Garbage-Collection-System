@@ -17,6 +17,8 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from '@expo-google-fonts/inter';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 interface BulkFrontProps {
   onAddPress: () => void;
@@ -114,15 +116,18 @@ const BulkFront: React.FC<BulkFrontProps> = ({
         <Text style={styles.title}>Waste Pickups</Text>
         
         <View style={styles.searchBarContainer}>
-          <TextInput
-            style={styles.searchBar}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-          />
-          <TouchableOpacity style={styles.fab} onPress={onAddPress}>
-            <Text style={styles.fabText}>+</Text>
-          </TouchableOpacity>
+          <View style={styles.searchInputContainer}>
+            <Ionicons name="search" size={24} color="#4b5563" style={styles.searchIcon} />
+             <TextInput
+      style={styles.searchBar}
+      placeholder="Search..."
+      value={searchQuery}
+      onChangeText={(text) => setSearchQuery(text)}
+    />
+  </View>
+  <TouchableOpacity style={styles.fab} onPress={onAddPress}>
+    <Text style={styles.fabText}>+</Text>
+  </TouchableOpacity>
         </View>
 
         <View style={styles.tabContainer}>
@@ -172,17 +177,29 @@ const styles = StyleSheet.create({
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    justifyContent: 'space-between',
+    padding: 10,
+    backgroundColor: '#f3f4f6', 
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 30,
+    paddingHorizontal: 10,
+    flex: 1,
+    marginRight: 10,
+    borderColor: '#d1d5db', // Tailwind border-gray-300
+    borderWidth: 1,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchBar: {
     flex: 1,
-    height: 40,
-    borderColor: '#d1d5db', // Tailwind border-gray-300
-    borderWidth: 1,
-    borderRadius: 30,
-    paddingLeft: 10,
-    backgroundColor: '#ffffff', // Tailwind bg-white
-    fontFamily: 'Inter_600SemiBold',
+    fontSize: 16,
+    paddingVertical: 8,
+    color: '#4b5563', 
   },
   tabContainer: {
     flexDirection: 'row',
