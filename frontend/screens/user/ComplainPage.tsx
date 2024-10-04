@@ -57,7 +57,7 @@ const ComplainDash: React.FC = () => {
     <TouchableOpacity onPress={() => handleCardPress(item)}>
       <View style={styles.complaintCard}>
         <View style={styles.cardHeader}>
-          <FontAwesome name="info-circle" size={24} color="#007BFF" style={styles.icon} />
+          <FontAwesome name="info-circle" size={13} color="#ff6347" style={styles.icon} />
           <Text style={styles.complaintId}>Complaint ID: {item.complaintId}</Text>
         </View>
         <Text style={styles.complaintProblem}>Problem: {item.problem}</Text>

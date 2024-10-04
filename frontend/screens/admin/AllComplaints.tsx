@@ -81,7 +81,7 @@ const AllComplaints: React.FC = () => {
     <TouchableOpacity onPress={() => setSelectedComplaint(item)}>
       <View style={styles.card}>
         {/* Add the icon here */}
-        <Icon name="book" size={13} color="#ff6347" style={styles.cardIcon} />
+        <Icon name="info-circle" size={13} color="#ff6347" style={styles.cardIcon} />
         <View style={styles.cardContent}>
           <Text style={styles.title}>Complaint ID: {item.complaintId}</Text>
           <Text style={styles.text}>Problem: {item.problem}</Text>

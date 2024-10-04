@@ -55,8 +55,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 5,
-    height: 110,
-    marginBottom:140,
+    height: 120,
+    marginBottom:100,
   },
   stepNumberContainer: {
     position: 'absolute',
@@ -64,15 +64,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#b3b3b3',
     padding: 10,
     borderRadius: 50,
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     alignItems: 'center',
     justifyContent: 'center',
     elevation: 5, // shadow effect
   },
   stepNumber: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   cardTitle: {
