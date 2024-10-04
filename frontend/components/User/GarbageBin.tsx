@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { getDatabase, ref, onValue } from 'firebase/database';
 
 const Dustbin = () => {
-  const [garbageLevel, setGarbageLevel] = useState(0); // Default garbage level
+  const [garbageLevel, setGarbageLevel] = useState(20); // Default garbage level
   const totalHeight = 200; // Total height of the dustbin in pixels
 
   // Fetch garbage level from Firebase Realtime Database
@@ -33,12 +33,15 @@ const Dustbin = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Garbage Monitoring System</Text>
+      <Text style={styles.title}>Smart Garbage Bin</Text>
       <View style={styles.binContainer}>
-        {/* Dustbin */}
-        <View style={styles.dustbin}>
-          {/* Garbage fill */}
-          <View style={[styles.garbage, { height: garbageHeight }]} />
+        {/* Dustbin with lid */}
+        <View style={styles.dustbinContainer}>
+          <View style={styles.binLid} />
+          <View style={styles.dustbin}>
+            {/* Garbage fill */}
+            <View style={[styles.garbage, { height: garbageHeight }]} />
+          </View>
         </View>
         {/* Text next to the bin */}
         <View style={styles.infoContainer}>
@@ -55,8 +58,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 50,
-    margin: 15,
-    marginBottom: 40,
+    marginBottom: 25,
   },
   title: {
     fontSize: 18,
@@ -67,13 +69,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  dustbinContainer: {
+    alignItems: 'center', // Center the bin and lid
+  },
+  binLid: {
+    width: 110,
+    height: 20,
+    backgroundColor: '#555', // Dark color for the lid
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50, // Rounded top corners to make it look like a lid
+    marginBottom: -2, // Slight overlap with the bin
+  },
   dustbin: {
     width: 100,
     height: 200, // Total height of the dustbin
     borderWidth: 2,
     borderColor: 'black',
-    position: 'relative',
     backgroundColor: '#f0f0f0', // Background of the dustbin (empty part)
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20, // Slightly rounded bottom edges for a bin shape
+    overflow: 'hidden', // To ensure the garbage fill doesn't overflow the bin shape
   },
   garbage: {
     width: '100%',
