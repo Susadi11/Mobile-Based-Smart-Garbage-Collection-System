@@ -3,6 +3,7 @@ import { View, TextInput, StyleSheet, Text, TouchableOpacity, Alert } from 'reac
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 type RootStackParamList = {
   Login: undefined;
@@ -21,6 +22,12 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  })
 
   const handleLogin = async () => {
     try {
@@ -41,6 +48,10 @@ const LoginScreen: React.FC<Props> = ({ navigation }) => {
       Alert.alert('Login Error', error instanceof Error ? error.message : 'An unknown error occurred');
     }
   };
+
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
     <View style={styles.container}>
@@ -102,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: '#fff',
     fontSize: 16,
-    fontFamily: 'Inter_400Regular',
+    fontFamily: 'Inter_500Medium',
   },
   button: {
     backgroundColor: '#047857', // Tailwind's green-600
@@ -116,7 +127,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '500',
-    fontFamily: 'Inter_500Medium',
+    fontFamily: 'Inter_600SemiBold',
   },
   link: {
     marginTop: 8,

@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import { app } from '../../firebaseConfig';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -31,6 +32,12 @@ const HomeUs: React.FC = () => {
   const [fadeAnim] = useState(new Animated.Value(1)); // Animation value for tip fade in/out
   const navigation = useNavigation<HomeUsNavigationProp>();
   const firestore = getFirestore(app);
+
+  let [fontsLoaded] = useFonts({
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
 
   const wasteManagementTips = [
     'Composting is a great way to reduce waste and improve soil health. Try starting a compost bin today!',
@@ -117,6 +124,10 @@ const HomeUs: React.FC = () => {
       </TouchableOpacity>
     </Animated.View>
   );
+
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.scrollViewContainer}>
@@ -220,6 +231,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#111827',
+    fontFamily: 'Inter_700Bold',
   },
   profileIcon: {
     padding: 8,
@@ -245,6 +257,7 @@ const styles = StyleSheet.create({
     height: 48,
     fontSize: 16,
     color: '#4b5563',
+    fontFamily: 'Inter_600SemiBold'
   },
   actionRow: {
     flexDirection: 'row',
@@ -269,6 +282,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     color: '#111827',
+    fontFamily: 'Inter_600SemiBold'
   },
   advertisement: {
     backgroundColor: '#4CAF50',
@@ -287,11 +301,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ffffff',
     marginBottom: 8,
+    fontFamily: 'Inter_700Bold'
   },
   adContent: {
     fontSize: 16,
     color: '#ffffff',
     textAlign: 'center',
+    fontFamily: 'Inter_600SemiBold'
   },
   dotsContainer: {
     flexDirection: 'row',
@@ -309,6 +325,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#111827',
     marginBottom: 16,
+    fontFamily: 'Inter_600SemiBold'
   },
   scrollViewContent: {
     paddingVertical: 8,
@@ -344,11 +361,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#111827',
+    fontFamily: 'Inter_600SemiBold'
   },
   priceText: {
     fontSize: 14,
     color: '#6b7280',
     marginTop: 4,
+    fontFamily: 'Inter_600SemiBold'
   },
   exploreMoreCard: {
     justifyContent: 'center',
@@ -359,14 +378,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#4b5563',
+    fontFamily: 'Inter_600SemiBold'
   },
   loadingText: {
     fontSize: 16,
     color: '#6b7280',
+    fontFamily: 'Inter_600SemiBold'
   },
   noProductsText: {
     fontSize: 16,
     color: '#6b7280',
+    fontFamily: 'Inter_600SemiBold'
   },
 });
 

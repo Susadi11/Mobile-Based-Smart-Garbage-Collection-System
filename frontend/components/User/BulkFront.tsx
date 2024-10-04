@@ -10,6 +10,13 @@ import {
 } from 'react-native';
 import { Menu, Provider } from 'react-native-paper';
 import { TransactionItem } from './Bulk';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 
 interface BulkFrontProps {
   onAddPress: () => void;
@@ -27,6 +34,17 @@ const BulkFront: React.FC<BulkFrontProps> = ({
   const [selectedTab, setSelectedTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [menuVisible, setMenuVisible] = useState<string | null>(null);
+
+  let [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return null; // or a loading indicator
+  }
 
   const filteredTransactions = transactions
     .filter((item) =>
@@ -147,9 +165,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
     marginBottom: 16,
     color: '#1f2937', // Tailwind text-gray-800
+    fontFamily: 'Inter_700Bold',
   },
   searchBarContainer: {
     flexDirection: 'row',
@@ -164,6 +182,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     paddingLeft: 10,
     backgroundColor: '#ffffff', // Tailwind bg-white
+    fontFamily: 'Inter_600SemiBold',
   },
   tabContainer: {
     flexDirection: 'row',
@@ -182,9 +201,11 @@ const styles = StyleSheet.create({
   },
   tabText: {
     color: '#4b5563', // Tailwind text-gray-600
+    fontFamily: 'Inter_600SemiBold',
   },
   selectedTabText: {
     color: '#ffffff', // Tailwind text-white
+    fontFamily: 'Inter_600SemiBold',
   },
   transactionItem: {
     flexDirection: 'row',
@@ -207,13 +228,14 @@ const styles = StyleSheet.create({
   },
   transactionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 4,
     color: '#1f2937', // Tailwind text-gray-800
+    fontFamily: 'Inter_600SemiBold',
   },
   transactionText: {
     color: '#4b5563', // Tailwind text-gray-600
     marginBottom: 2,
+    fontFamily: 'Inter_500Medium',
   },
   fab: {
     marginLeft: 8,
@@ -227,12 +249,13 @@ const styles = StyleSheet.create({
   fabText: {
     fontSize: 24,
     color: '#ffffff', // Tailwind text-white
+    fontFamily: 'Inter_600SemiBold',
   },
   menuDots: {
     fontSize: 24,
-    fontWeight: 'bold',
     color: '#4b5563', // Tailwind text-gray-600
     marginBottom: 60,
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 
