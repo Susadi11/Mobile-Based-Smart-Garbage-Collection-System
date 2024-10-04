@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { getDocs, collection } from 'firebase/firestore';
 import { db } from '@/firebaseConfig'; // Adjust this import based on your Firebase setup
 import { FontAwesome } from '@expo/vector-icons'; // For icons, you can install expo icons
+import Card from '@/components/vindi/Card'
 
 type RootStackParamList = {
   ComplainDash: undefined;
@@ -72,6 +73,7 @@ const ComplainDash: React.FC = () => {
       </View>
     </TouchableOpacity>
   );
+  
   const renderProgressBar = () => (
     <View style={styles.progressContainer}>
       {currentComplaint && (
@@ -162,23 +164,16 @@ const ComplainDash: React.FC = () => {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Complaint Dashboard</Text>
       </View>
+     
 
       <View style={styles.mainContent}>
-        <View style={styles.card}>
-          <Image
-            source={{ uri: 'https://www.slnsoftwares.com/images/benefit-complaint-system.webp' }}
-            style={styles.cardImage}
-          />
-          <Text style={styles.cardTitle}>
-            "Got a problem? Let us know by submitting your complaint. We’ll make sure it gets to the right place and help you resolve it quickly. Click 'Add Complaint' to get started."
-          </Text>
-          <TouchableOpacity
+      <Card/>
+        <TouchableOpacity
             style={styles.cardButton}
             onPress={() => navigation.navigate('AddComplaint')}
           >
             <Text style={styles.cardButtonText}>Add Complaint</Text>
           </TouchableOpacity>
-        </View>
 
         <Text style={styles.text3}>My Complaints</Text>
         {!loading ? (
@@ -229,14 +224,14 @@ const styles = StyleSheet.create({
   },
   mainContent: {
     flex: 1,
-    padding: 20,
+    padding: 16,
   },
   card: {
     width: '100%',
     backgroundColor: 'white',
     borderRadius: 10,
-    elevation: 5,
-    marginBottom: 20,
+    elevation: 2,
+    marginBottom: 10,
     padding: 15,
   },
   cardImage: {
@@ -258,17 +253,20 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     width: 150,
     alignSelf: 'center',
+    marginBottom:20,
+
   },
   cardButtonText: {
     color: 'white',
     fontSize: 16,
     textAlign: 'center',
     fontWeight: 'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   text3: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 25,
+    marginBottom: 15,
   },
   complaintList: {
     paddingBottom: 20,
@@ -278,7 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     elevation: 4,
     padding: 15,
-    marginBottom: 15,
+    marginBottom: 6,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     shadowColor: '#000',
@@ -298,10 +296,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: 'black',
+    fontFamily: 'Inter_600SemiBold',
   },
   complaintProblem: {
     fontSize: 14,
-    marginBottom: 10,
+    marginBottom: 0,
+    fontFamily: 'Inter',
   },
   complaintStatus: {
     fontSize: 14,
@@ -330,6 +330,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 20,
+    fontFamily: 'Inter_600SemiBold',
   },
   problemDetails: {
     marginBottom: 10,
@@ -359,6 +360,7 @@ const styles = StyleSheet.create({
   circleText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   stepLabel: {
     marginTop: 5,
@@ -384,7 +386,7 @@ const styles = StyleSheet.create({
   line: {
     width: 30,
     height: 2,
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#ddd',
     alignSelf: 'center',
   },
   

@@ -133,6 +133,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: 'black',
     fontWeight: 'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   loading: {
     flex: 1,
@@ -160,10 +161,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
+    fontFamily: 'Inter_600',
   },
   text: {
     fontSize: 16,
     marginBottom: 3,
+    fontFamily: 'Inter_600',
   },
   statusText: {
     fontSize: 16,
@@ -199,6 +202,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
     color: "#4caf50",
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 

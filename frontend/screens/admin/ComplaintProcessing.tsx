@@ -120,6 +120,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f8f8f8",
+    
   },
   header: {
     width: "100%",
@@ -133,6 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: 'black',
     fontWeight: 'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   loading: {
     flex: 1,
@@ -160,10 +162,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     marginBottom: 5,
+    fontFamily: 'Inter_600SemiBold',
   },
   text: {
     fontSize: 16,
     marginBottom: 3,
+    fontFamily: 'Inter_600',
   },
   statusText: {
     fontSize: 16,
@@ -193,12 +197,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginVertical: 10,
+    
   },
   complaintCountText: {
     fontSize: 18,
     fontWeight: "bold",
     marginLeft: 10,
     color: "#4caf50",
+    fontFamily: 'Inter_600SemiBold',
   },
 });
 

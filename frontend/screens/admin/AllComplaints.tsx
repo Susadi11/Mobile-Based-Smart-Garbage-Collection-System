@@ -185,6 +185,7 @@ const styles = StyleSheet.create({
     fontSize: 25,
     color: 'black',
     fontWeight:'bold',
+    fontFamily: 'Inter_600SemiBold',
   },
   complaintCountContainer: {
     flexDirection: "row",
@@ -197,6 +198,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginLeft: 10,
     color: "#4caf50",
+    fontFamily: 'Inter_600SemiBold',
   },
   listContainer: {
     padding: 20,
@@ -242,15 +244,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     color: "#333",
     marginBottom: 5,
+    fontFamily: 'Inter_600SemiBold',
   },
   text: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#666",
     marginBottom: 5,
+    fontFamily: 'Inter_600SemiBold',
   },
   statusText: {
     color: "red",
@@ -275,7 +279,7 @@ const styles = StyleSheet.create({
    
   },
   modalTitle: {
-    fontSize: 30,
+    fontSize: 25,
     fontWeight: "bold",
     marginBottom: 10,
    
@@ -283,7 +287,7 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
     marginBottom: 10,
-    fontWeight:'bold',
+    fontFamily: 'Inter_600',
     
   },
   statusOptions: {
@@ -301,6 +305,7 @@ const styles = StyleSheet.create({
   statusButtonText: {
     color: "#fff",
     fontSize: 16,
+    fontFamily: 'Inter_600',
     
   },
 });
