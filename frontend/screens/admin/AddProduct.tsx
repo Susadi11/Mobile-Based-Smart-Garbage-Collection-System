@@ -174,17 +174,20 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 20,
         backgroundColor: '#f8f8f8',
+        fontFamily: 'Inter_400Regular',
     },
     header: {
         backgroundColor: '#95d09b',
         padding: 20,
         borderRadius: 5,
+        fontFamily: 'Inter_400Regular',
     },
     headerText: {
         fontSize: 20,
         textAlign: 'center',
         fontWeight: 'bold',
         paddingTop: 20,
+        
     },
     form: {
         marginTop: 20,
@@ -212,6 +215,7 @@ const styles = StyleSheet.create({
         fontSize: 16, // Increase font size to make the cursor larger
         color: '#333',
         height: 40, // Adjust height for better visibility
+        fontFamily: 'Inter_400Regular',
     },
     imagePicker: {
         borderWidth: 1,
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
-        textTransform: 'uppercase',
+        fontFamily: 'Inter_400Regular',
     },
 });
 

@@ -232,6 +232,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 20,
     backgroundColor: '#f8f8f8',
+    fontFamily: 'Inter_400Regular',
   },
   formContainer: {
     backgroundColor: '#fff',
@@ -253,6 +254,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: 'bold',
     marginBottom: 5,
+    
   },
   topic: {
     fontWeight: 'bold',
@@ -260,6 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     padding: 10,
     paddingLeft: 80,
+     
   },
   row: {
     flexDirection: 'row',
@@ -279,6 +282,7 @@ const styles = StyleSheet.create({
   confirmButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Inter_400Regular',
   },
 });
 

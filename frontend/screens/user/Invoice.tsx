@@ -23,7 +23,7 @@ type RouteParams = {
     };
 };
 
-const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
+const Invoice = ({ route, navigation }: { route: RouteProp<RouteParams, 'params'>, navigation: any }) => {
     const { formData, invoiceNumber,totalPrice } = route.params; // Retrieve data passed via navigation
     console.log('Total Price: ' ,totalPrice);
     
@@ -167,10 +167,13 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
 
                 <View style={styles.billToSection}>
                     <Text style={styles.subTitleText}>Bill To:</Text>
+                    <View>
                     <Text style={styles.text}>Name: {formData.name}</Text>
                     <Text style={styles.text}>Phone: {formData.phone}</Text>
                     <Text style={styles.text}>Pickup Location: {formData.urbanCouncil}</Text>
                     <Text style={styles.text}>Email: {formData.email}</Text>
+                                        
+                </View>
                 </View>
 
                 <View style={styles.table}>
@@ -196,6 +199,10 @@ const Invoice = ({ route }: { route: RouteProp<RouteParams, 'params'> }) => {
                 <TouchableOpacity style={styles.button} onPress={generateReport}>
                     <Text style={styles.buttonText}>Download Invoice</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button1} onPress={() => navigation.navigate('StorePage')}>
+                    <Text style={styles.buttonText1}>Go to Home</Text>
+                </TouchableOpacity>
             </View>
         </ScrollView>
     );
@@ -206,6 +213,7 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#f8f8f8',
         flexGrow: 1,
+        fontFamily: 'Inter_400Regular', // Set the regular Inter font
     },
     invoiceContainer: {
         backgroundColor: '#fff',
@@ -216,12 +224,14 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.2,
         shadowRadius: 10,
         elevation: 5,
+        fontFamily: 'Inter_400Regular',
     },
     headerText: {
         fontSize: 24,
         fontWeight: 'bold',
         textAlign: 'center',
         marginBottom: 10,
+        fontFamily: 'Inter_400Regular',
     },
     divider: {
         height: 1,
@@ -233,40 +243,48 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 10,
         color:'#10b981',
+        fontFamily: 'Inter_400Regular',
     },
     titleText: {
         fontSize: 18,
         fontWeight: 'bold',
+        fontFamily: 'Inter_400Regular',
     },
     infoText: {
         fontSize: 16,
+        fontFamily: 'Inter_400Regular',
     },
     billToSection: {
         marginBottom: 10,
     },
     subTitleText: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight:'bold',
         marginTop: 10,
         marginBottom: 5,
+        fontFamily: 'Inter_400Regular',
     },
     text: {
-        fontSize: 16,
+        fontSize: 13,
+        fontFamily: 'Inter_400Regular',
     },
     table: {
         marginVertical: 10,
         borderWidth: 1,
-        borderColor: '#10b981',
+        borderColor: '#ccc',
+        
     },
     tableHeader: {
         backgroundColor: '#f1f1f1',
         padding: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
+        fontFamily: 'Inter_400Regular',
     },
     tableHeaderText: {
         fontSize: 16,
         fontWeight: 'bold',
+        fontFamily: 'Inter_400Regular',
     },
     tableRow: {
         flexDirection: 'row',
@@ -287,24 +305,28 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         padding: 10,
+        fontFamily: 'Inter_400Regular',
     },
     footerTextRight: {
         fontSize: 16,
         fontWeight: 'bold',
         padding: 10,
+        fontFamily: 'Inter_400Regular',
     },
     thankYouText: {
-        fontSize: 16,
+        fontSize: 19,
         fontWeight: 'bold',
         textAlign: 'center',
         marginVertical: 10,
         marginTop: 25,
         color:'#4CAF50',
+        fontFamily: 'Inter_400Regular',
     },
     smallText: {
         fontSize: 14,
         textAlign: 'center',
         color: '#4b5563',
+        fontFamily: 'Inter_400Regular',
     },
     button: {
         backgroundColor: '#4CAF50',
@@ -316,6 +338,19 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#fff',
         fontWeight: 'bold',
+        fontFamily: 'Inter_400Regular',
+    },
+    button1: {
+        backgroundColor: '#33bbff',
+        borderRadius: 5,
+        padding: 15,
+        alignItems: 'center',
+        marginTop: 20,
+    },
+    buttonText1: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontFamily: 'Inter_400Regular',
     },
 });
 
