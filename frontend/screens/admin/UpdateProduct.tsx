@@ -200,6 +200,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         padding: 20,
         backgroundColor: '#f8f8f8',
+        fontFamily: 'Inter_400Regular',
     },
     header: {
         backgroundColor: '#95d09b',
@@ -219,6 +220,7 @@ const styles = StyleSheet.create({
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowRadius: 5,
+        fontFamily: 'Inter_400Regular',
     },
     formGroup: {
         marginBottom: 15,
@@ -227,6 +229,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
         marginBottom: 5,
+        fontFamily: 'Inter_400Regular',
     },
     input: {
         borderWidth: 1,
@@ -234,9 +237,10 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         paddingHorizontal: 10,
         paddingVertical: 8,
-        fontSize: 16,
+        fontSize: 14,
         color: '#333',
         height: 40,
+        fontFamily: 'Inter_400Regular',
     },
     imagePicker: {
         borderWidth: 1,
@@ -267,7 +271,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
-        textTransform: 'uppercase',
+        fontFamily: 'Inter_400Regular',
     },
 });
 

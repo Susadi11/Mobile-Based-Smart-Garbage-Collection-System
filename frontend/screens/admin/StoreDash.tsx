@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#f5f5f5',
+        fontFamily: 'Inter_400Regular',
     },
     scrollContainer: {
         paddingHorizontal: 0,
@@ -196,6 +197,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 20,
         marginTop: 20,
+        fontFamily: 'Inter_400Regular', 
     },
     inputContainer: {
         width: '90%',
@@ -239,11 +241,13 @@ const styles = StyleSheet.create({
         marginLeft: 15,
         flex: 1,
         justifyContent: 'space-between',
+        fontFamily: 'Inter_400Regular', 
     },
     productName: {
         fontSize: 18,
         fontWeight: 'bold',
         color: '#333',
+          
     },
     productPrice: {
         fontSize: 20,
@@ -279,6 +283,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
         fontWeight: 'bold',
+        fontFamily: 'Inter_400Regular', 
     },
     
     
@@ -302,6 +307,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         justifyContent: 'center',
+        fontFamily: 'Inter_400Regular', 
     },
     
     deleteButton: {
@@ -315,6 +321,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
         fontWeight: 'bold',
+        fontFamily: 'Inter_400Regular', 
     },
     fab: {
         position: 'absolute',

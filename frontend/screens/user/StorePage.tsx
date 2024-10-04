@@ -85,6 +85,7 @@ const StorePage = ({ navigation }: any) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        fontFamily: 'Inter_400Regular',
        
     },
     background: {
@@ -102,9 +103,10 @@ const styles = StyleSheet.create({
     title: {
         color: '#ffffff',
         fontWeight: 'bold',
-        fontSize: 33,
+        fontSize: 32,
         textAlign: 'center',
         marginBottom: 20,
+        fontFamily: 'Inter_400Regular', 
     },
     title2: {
         color: '#ffffff',
@@ -112,6 +114,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         textAlign: 'center',
         marginBottom: 20,
+        fontFamily: 'Inter_400Regular', 
     },
     inputContainer: {
         width: '90%',
@@ -130,6 +133,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4,
         fontSize: 16,
         color: '#000',
+        fontFamily: 'Inter_400Regular', 
     },
     productCard: {
         marginBottom: 20,
@@ -193,6 +197,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginLeft: 10,
+        fontFamily: 'Inter_400Regular', 
     },
 });
 
