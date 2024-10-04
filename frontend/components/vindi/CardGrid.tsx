@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    height: 100,
+    height: 120,
     width: "45%",
     padding: 10,
     marginBottom:20,

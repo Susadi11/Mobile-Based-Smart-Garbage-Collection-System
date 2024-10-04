@@ -165,6 +165,7 @@ const ComplainDash: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f3f4f6'
   },
   header: {
     width: '100%',
@@ -183,24 +184,29 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
+    padding: 10,
   },
   map: {
     width: '100%',
     height: 300,
-    marginBottom: 80,
+    marginBottom: 10,
     marginTop: 20,
   },
   statusButton: {
+
     paddingVertical: 5,
     paddingHorizontal: 7,
     backgroundColor: "#4caf50",
-    borderRadius: 5,
-    width: 140,
+    borderRadius: 20,
+    width: 170,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom:20,
   },
   statusButtonText: {
     color: "#fff",
     fontSize: 20,
+    
   },
   modalContainer: {
     flex: 1,

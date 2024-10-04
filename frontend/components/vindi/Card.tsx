@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 170,
+    width: 180,
     elevation: 6, // for Android shadow
     shadowColor: '#000', // for iOS shadow
     shadowOffset: { width: 0, height: 3 },
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   stepNumber: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   cardTitle: {
