@@ -1,121 +1,135 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, TouchableOpacity, Platform } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import RNPickerSelect from 'react-native-picker-select';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../firebaseConfig';
+import { useRoute } from '@react-navigation/native';
 
 type FormData = {
-    name: string;
-    phone: string;
-    email: string;
-    amount: string;
-    date: string;
-    time: string;
-    urbanCouncil: string;
-    area: string;
-    city: string;
-    state: string;
-    postCode: string;
+  name: string;
+  phone: string;
+  email: string;
+  amount: string;
+  date: string;
+  time: string;
+  urbanCouncil: string;
+  
+  
 };
 
 type RootStackParamList = {
-    PlaceOrder: undefined;
-    Invoice: { formData: FormData; invoiceNumber: string; totalPrice: number;  unitPrice: number };
+  PlaceOrder:{ unitPrice: number };
+  Invoice: { formData: FormData; invoiceNumber: string; totalPrice: number; unitPrice: number };
 };
 
 type PlaceOrderScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PlaceOrder'>;
 
-interface PlaceOrderProps {
-    unitPrice: number; // Expecting unitPrice as a prop
-}
+ 
 
 const PlaceOrder = () => {
-    const navigation = useNavigation<PlaceOrderScreenNavigationProp>();
-    const [formData, setFormData] = useState<FormData>({
-        name: '',
-        phone: '',
-        email: '',
-        amount: '',
-        date: '',
-        time: '',
-        urbanCouncil: '',
-        area: '',
-        city: '',
-        state: '',
-        postCode: ''
-    });
- 
-    const [selectedCouncil, setSelectedCouncil] = useState<string | null>(null);
-    const unitPrice = 10; 
-  
-    const handleChange = (name: keyof FormData, value: string) => {
-        setFormData({ ...formData, [name]: value });
+  const navigation = useNavigation<PlaceOrderScreenNavigationProp>();
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    phone: '',
+    email: '',
+    amount: '',
+    date: '',
+    time: '',
+    urbanCouncil: '',
+    
+  }
+);
+
+  const [selectedCouncil, setSelectedCouncil] = useState<string | null>(null);
+  const route = useRoute();
+  const { unitPrice } = route.params as { unitPrice: number };
+
+  const [date, setDate] = useState<Date | null>(null);
+  const [time, setTime] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
+  const handleChange = (name: keyof FormData, value: string) => {
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const generateInvoiceNumber = () => {
+    return `INV-${Math.floor(Math.random() * 1000000)}`; // Generate random invoice number
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedCouncil || !formData.amount || isNaN(Number(formData.amount))) {
+      Alert.alert('Error', 'Please fill in all required fields.');
+      return;
+    }
+
+    
+    // if (isNaN(amountValue) || amountValue <= 0) {
+    //   Alert.alert('Error', 'Please enter a valid amount.');
+    //   return;
+    // }
+
+    const totalPrice = unitPrice * Number(formData.amount);
+    
+    console.log('Amount', formData.amount);
+    console.log('Unit Price', unitPrice);
+    console.log('Total Price', totalPrice);
+
+    
+    // Calculate totalPrice using the unitPrice prop
+    const invoiceNumber = generateInvoiceNumber();
+
+    const orderData = {
+      ...formData,
+      amount: formData.amount,
+      urbanCouncil: selectedCouncil,
+      totalPrice,
+      invoiceNumber,
+      date: date ? date.toISOString().split('T')[0] : '', // Format the date
+      time: time ? time.toISOString().split('T')[1].slice(0, 5) : '', // Format the time
+      createdAt: new Date().toISOString(),
     };
 
-    const generateInvoiceNumber = () => {
-        return `INV-${Math.floor(Math.random() * 1000000)}`; // Generate random invoice number
-    };
+    try {
+      await addDoc(collection(db, 'orders'), orderData);
+      navigation.navigate('Invoice', {
+        formData: orderData,
+        invoiceNumber,
+        totalPrice,
+        unitPrice,
+      });
+    } catch (error) {
+      console.error('Error saving order: ', error);
+      Alert.alert('Error', 'Failed to place the order. Please try again.');
+    }
+  };
 
-    const handleSubmit = async () => {
- 
-        if ( !selectedCouncil) {
- 
-            Alert.alert("Error", "Please fill in all required fields.");
-            return;
-        }
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+         <Text style={styles.topic}>Fill to Place an Order</Text>
+      <View style={styles.formContainer}>
+        <Text style={styles.label}>Full Name</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Full Name"
+          value={formData.name}
+          onChangeText={(text) => handleChange('name', text)}
+        />
 
- 
-        const totalPrice = Number(unitPrice) * parseFloat(formData.amount);
-        const invoiceNumber = generateInvoiceNumber();
+        <Text style={styles.label}>Phone Number</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter your phone number"
+          value={formData.phone}
+          onChangeText={(text) => handleChange('phone', text)}
+          keyboardType="numeric"
+          maxLength={10}
+        />
 
-        const orderData = {
-            ...formData,
-            amount: formData.amount,
-            urbanCouncil: selectedCouncil,
-            totalPrice,
-            invoiceNumber,
-            createdAt: new Date().toISOString(),
-        };
-
-        try {
-            await addDoc(collection(db, 'orders'), orderData);
-            navigation.navigate('Invoice', {
-                formData: orderData,
-                invoiceNumber,
-                totalPrice,
-              
-            });
-        } catch (error) {
-            console.error('Error saving order: ', error);
-            Alert.alert('Error', 'Failed to place the order. Please try again.');
-        }
-    };
- 
-
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <View style={styles.formContainer}>
-                <Text style={styles.label}>Full Name</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Full Name"
-                    value={formData.name}
-                    onChangeText={(text) => handleChange('name', text)}
-                />
-
-                <Text style={styles.label}>Phone Number</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter your phone number"
-                    value={formData.phone}
-                    onChangeText={(text) => handleChange('phone', text)}
-                    keyboardType="numeric"
-                    maxLength={10}
-                />
-
-                <Text style={styles.label}>Email Address</Text>
+        <Text style={styles.label}>Email Address</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="Enter your email"
@@ -127,156 +141,144 @@ const PlaceOrder = () => {
                             Alert.alert('Please enter a valid email address');
                         }
                     }}
-                />
+        />
 
-                <Text style={styles.label}>Amount</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter Quantity"
-                    value={formData.amount}
-                    onChangeText={(text) => handleChange('amount', text)}
-                    keyboardType="numeric"
-                    maxLength={3}
-                />
+        <Text style={styles.label}>Amount</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Quantity"
+          value={formData.amount}
+          onChangeText={(text) => handleChange('amount', text)}
+          keyboardType="numeric"
+          maxLength={3}
+        />
 
-                <View style={styles.row}>
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Date</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="YYYY-MM-DD"
-                            value={formData.date}
-                            onChangeText={(text) => handleChange('date', text)}
-                            keyboardType="numeric"
-                            maxLength={10}
-                        />
-                    </View>
-                    <View style={styles.inputWrapper}>
-                        <Text style={styles.label}>Time</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="HH:MM"
-                            value={formData.time}
-                            onChangeText={(text) => handleChange('time', text)}
-                            keyboardType="numeric"
-                            maxLength={5}
-                        />
-                    </View>
-                </View>
+        {/* Date Picker */}
+        <View style={styles.row}>
+          <View style={styles.inputWrapper}>
+            <Text style={styles.label}>Date</Text>
+            <TouchableOpacity onPress={() => setShowDatePicker(true)} style={styles.input}>
+              <Text>{date ? date.toDateString() : 'Select Date'}</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date || new Date()}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(Platform.OS === 'ios');
+                  setDate(selectedDate || date);
+                }}
+              />
+            )}
+          </View>
 
-                <Text style={styles.label}>Urban Council</Text>
-                <RNPickerSelect
-                    onValueChange={(value) => setSelectedCouncil(value)}
-                    items={[
-                        { label: 'Colombo Municipal Council', value: 'Colombo Municipal Council' },
-                        { label: 'Kandy Municipal Council', value: 'Kandy Municipal Council' },
-                        { label: 'Galle Municipal Council', value: 'Galle Municipal Council' },
-                        { label: 'Matara Municipal Council', value: 'Matara Municipal Council' },
-                        { label: 'Negombo Municipal Council', value: 'Negombo Municipal Council' },
-                        { label: 'Jaffna Municipal Council', value: 'Jaffna Municipal Council' },
-                        { label: 'Dehiwala-Mount Lavinia Municipal Council', value: 'Dehiwala-Mount Lavinia Municipal Council' },
-                        { label: 'Moratuwa Municipal Council', value: 'Moratuwa Municipal Council' },
-                        { label: 'Kurunegala Municipal Council', value: 'Kurunegala Municipal Council' },
-                        { label: 'Ratnapura Municipal Council', value: 'Ratnapura Municipal Council' },
-                        { label: 'Badulla Municipal Council', value: 'Badulla Municipal Council' },
-                                    ]}
-                    placeholder={{ label: 'Order picking urban council...', value: null }}
-                    style={{
-                        inputIOS: styles.input,
-                        inputAndroid: styles.input,
-                    }}
-                />
+          {/* Time Picker */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.label}>Time</Text>
+            <TouchableOpacity onPress={() => setShowTimePicker(true)} style={styles.input}>
+              <Text>{time ? time.toTimeString().slice(0, 5) : 'Select Time'}</Text>
+            </TouchableOpacity>
+            {showTimePicker && (
+              <DateTimePicker
+                value={time || new Date()}
+                mode="time"
+                display="default"
+                onChange={(event, selectedTime) => {
+                  setShowTimePicker(Platform.OS === 'ios');
+                  setTime(selectedTime || time);
+                }}
+              />
+            )}
+          </View>
+        </View>
 
-                <Text style={styles.subLabel}>Address Details</Text>
+        <Text style={styles.label}>Urban Council</Text>
+        <RNPickerSelect
+          onValueChange={(value) => setSelectedCouncil(value)}
+          items={[
+            { label: 'Colombo Municipal Council', value: 'Colombo Municipal Council' },
+            { label: 'Kandy Municipal Council', value: 'Kandy Municipal Council' },
+            { label: 'Galle Municipal Council', value: 'Galle Municipal Council' },
+            { label: 'Matara Municipal Council', value: 'Matara Municipal Council' },
+            { label: 'Negombo Municipal Council', value: 'Negombo Municipal Council' },
+            { label: 'Jaffna Municipal Council', value: 'Jaffna Municipal Council' },
+            { label: 'Dehiwala-Mount Lavinia Municipal Council', value: 'Dehiwala-Mount Lavinia Municipal Council' },
+            { label: 'Moratuwa Municipal Council', value: 'Moratuwa Municipal Council' },
+            { label: 'Kurunegala Municipal Council', value: 'Kurunegala Municipal Council' },
+            { label: 'Ratnapura Municipal Council', value: 'Ratnapura Municipal Council' },
+            { label: 'Badulla Municipal Council', value: 'Badulla Municipal Council' },
+            // Add more councils as needed
+          ]}
+          placeholder={{ label: 'Order picking urban council...', value: null }}
+          style={{
+            inputIOS: styles.input,
+            inputAndroid: styles.input,
+          }}
+        />
 
-                <View style={styles.row}>
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter area"
-                            value={formData.area}
-                            onChangeText={(text) => handleChange('area', text)}
-                        />
-                    </View>
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter city"
-                            value={formData.city}
-                            onChangeText={(text) => handleChange('city', text)}
-                        />
-                    </View>
-                </View>
-
-                <View style={styles.row}>
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Enter state"
-                            value={formData.state}
-                            onChangeText={(text) => handleChange('state', text)}
-                        />
-                    </View>
-                    <View style={styles.inputWrapper}>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Post Code"
-                            value={formData.postCode}
-                            onChangeText={(text) => handleChange('postCode', text)}
-                        />
-                    </View>
-                </View>
-
-                <Button
-                    title="Confirm Order"
-                    onPress={handleSubmit}
-                    color="#6A64F1"
-                />
-            </View>
-        </ScrollView>
-    );
+        {/* Confirm Order Button */}
+        <TouchableOpacity style={styles.confirmButton} onPress={handleSubmit}>
+          <Text style={styles.confirmButtonText}>Confirm Order</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flexGrow: 1,
-        padding: 20,
-        backgroundColor: '#f8f8f8',
-    },
-    formContainer: {
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOpacity: 0.1,
-        shadowOffset: { width: 0, height: 2 },
-        shadowRadius: 8,
-        elevation: 2,
-    },
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 10,
-        marginBottom: 15,
-    },
-    label: {
-        fontWeight: 'bold',
-        marginBottom: 5,
-    },
-    subLabel: {
-        fontSize: 16,
-        marginTop: 10,
-        marginBottom: 10,
-    },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-    inputWrapper: {
-        flex: 1,
-        marginHorizontal: 5,
-    },
+  container: {
+    flexGrow: 1,
+    padding: 20,
+    backgroundColor: '#f8f8f8',
+  },
+  formContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 15,
+  },
+  label: {
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
+  topic: {
+    fontWeight: 'bold',
+    marginBottom: 20,
+    fontSize: 20,
+    padding: 10,
+    paddingLeft: 80,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  inputWrapper: {
+    flex: 1,
+    marginHorizontal: 5,
+  },
+  confirmButton: {
+    paddingVertical: 10,
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
 });
 
 export default PlaceOrder;
