@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { getDatabase, ref, onValue } from 'firebase/database';
 
 const Dustbin = () => {
-  const [garbageLevel, setGarbageLevel] = useState(0); // Default garbage level
+  const [garbageLevel, setGarbageLevel] = useState(20); // Default garbage level
   const totalHeight = 200; // Total height of the dustbin in pixels
 
   // Fetch garbage level from Firebase Realtime Database
@@ -33,7 +33,7 @@ const Dustbin = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Garbage Monitoring System</Text>
+      <Text style={styles.title}>Smart Garbage Bin</Text>
       <View style={styles.binContainer}>
         {/* Dustbin with lid */}
         <View style={styles.dustbinContainer}>
