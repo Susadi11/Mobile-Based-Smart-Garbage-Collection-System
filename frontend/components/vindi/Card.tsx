@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     height: 120,
-    marginBottom:100,
+    marginBottom:120,
   },
   stepNumberContainer: {
     position: 'absolute',

@@ -254,6 +254,7 @@ const styles = StyleSheet.create({
     width: 150,
     alignSelf: 'center',
     marginBottom:20,
+    marginTop:20,
 
   },
   cardButtonText: {
