@@ -9,6 +9,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFonts, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
+
 type RootStackParamList = {
   Home: undefined;
   BulkSchedules: undefined;
@@ -16,6 +17,7 @@ type RootStackParamList = {
   AllComplaints: undefined;
   Analytics: undefined;
   ProfilePage: undefined;
+  NumOfSmartDustbin: undefined;
   // Add other screens here
 };
 
@@ -23,6 +25,7 @@ const HomeAd = () => {
   const [activeDot, setActiveDot] = useState<number>(0);
   const [totalOrders, setTotalOrders] = useState<number>(0);
   const [pendingComplaints, setPendingComplaints] = useState<number>(0);
+  const [binsToCollect, setBinsToCollect] = useState<number>(1);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const firestore = getFirestore(app);
 
@@ -226,6 +229,17 @@ const HomeAd = () => {
           <Text style={styles.description}>Complaints awaiting resolution</Text>
         </TouchableOpacity>
       </View>
+
+      {/* New Card (Bins to Collect) */}
+      <TouchableOpacity 
+        style={styles.centerCard}
+        onPress={() => navigation.navigate('NumOfSmartDustbin')}>
+        <Icon name="trash-can-outline" size={40} color="#007BFF" style={styles.cardIcon} />
+        <Text style={styles.title}>Bins to Collect</Text>
+        <Text style={styles.orderCount}>{binsToCollect}</Text>
+        <Text style={styles.description}>Number of bins ready for collection</Text>
+      </TouchableOpacity>
+
     </ScrollView>
   );
 };
@@ -344,6 +358,23 @@ const styles = StyleSheet.create({
   },
   profileIcon: {
     padding: 8,
+  },
+  centerCard: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
+    width: '80%', // Slightly smaller width to center it
+    marginVertical: 20, // Add margin for vertical spacing
+    padding: 20,
+    alignSelf: 'center', // Center the card horizontally
+    alignItems: 'center',
   },
   
 });
