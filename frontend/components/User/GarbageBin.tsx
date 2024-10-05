@@ -4,7 +4,7 @@ import { ref, onValue } from 'firebase/database';
 import { database } from '../../firebaseConfig'; // Import your Firebase config
 
 const Dustbin = () => {
-  const [garbageLevel, setGarbageLevel] = useState(78); // Default garbage level
+  const [garbageLevel, setGarbageLevel] = useState(0); // Default garbage level
   const [binDepth, setBinDepth] = useState(0); // Bin depth
   const [binStatus, setBinStatus] = useState(''); // Bin status
   const totalHeight = 200; // Total height of the dustbin in pixels
