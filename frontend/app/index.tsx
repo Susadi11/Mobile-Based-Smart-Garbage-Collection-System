@@ -37,6 +37,7 @@ import NormalSchedules from '../components/Admin/Bulk/NormalSchedules';
 import ComplaintPending from '../screens/admin/ComplaintPending';
 import ComplaintResolve from '../screens/admin/ComplaintResolve';
 import ComplaintProcessing from '../screens/admin/ComplaintProcessing';
+import NumOfSmartDustbin from '@/screens/admin/NumOfSmartDustins';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -206,6 +207,7 @@ const App: React.FC = () => {
           <Stack.Screen name="ProfilePage" component={ProfilePage} />
           <Stack.Screen name="Invoice" component={Invoice} />
           <Stack.Screen name="OrderList" component={OrderList} />
+          <Stack.Screen name="NumOfSmartDustbin" component={NumOfSmartDustbin} />
         </Stack.Navigator>
     </PaperProvider>
   );
