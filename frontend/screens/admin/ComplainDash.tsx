@@ -58,13 +58,12 @@ const ComplainDash: React.FC = () => {
 
   const generateReport = async () => {
     const htmlContent = `
-      <h1>Complaint Report</h1>
+      <h1 style="color:blue;margin-left: 250px;" >Complaint Report</h1>
       <table border="1" style="width: 100%; border-collapse: collapse;">
         <tr>
           <th>ID</th>
           <th>Name</th>
-          <th>Latitude</th>
-          <th>Longitude</th>
+          
           <th>Problem</th>
           <th>Status</th>
         </tr>
@@ -72,8 +71,7 @@ const ComplainDash: React.FC = () => {
           <tr>
             <td>${location.id}</td>
             <td>${location.firstName}</td>
-            <td>${location.latitude}</td>
-            <td>${location.longitude}</td>
+           
             <td>${location.problem}</td>
             <td>${location.status}</td>
           </tr>
