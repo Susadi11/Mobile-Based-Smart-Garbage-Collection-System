@@ -64,12 +64,15 @@ const ComplaintResolve = () => {
     return (
       <TouchableOpacity>
         <View style={styles.card}>
+        <Icon name="info-circle" size={13} color="#ff6347" style={styles.cardIcon} />
+        <View style={styles.cardContent}>
           <Text style={styles.title}>Complaint ID: {item.complaintId}</Text>
           <Text style={styles.text}>Problem: {item.problem}</Text>
           <Text style={styles.text}>Date: {item.date}</Text>
           <Text style={styles.text}>Time: {item.time}</Text>
           <Text style={styles.text}>Location: {`${item.location.latitude}, ${item.location.longitude}`}</Text>
           <Text style={styles.statusText}>Status: {item.status}</Text>
+        </View>
         </View>
       </TouchableOpacity>
     );
@@ -144,15 +147,24 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   card: {
+    flexDirection: "row", // Ensures the icon and text are side-by-side
     backgroundColor: "#fff",
-    padding: 15,
     borderRadius: 10,
-    marginVertical: 3,
+    padding: 15,
+    marginBottom: 6,
     shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
     shadowRadius: 10,
-    elevation: 5,
+    elevation: 3,
+    
+  },
+  cardIcon: {
+    marginRight: 15,
+    
+  },
+  cardContent:{
+     flex:1,
   },
   searchIcon: {
     marginRight: 10,
@@ -170,7 +182,7 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 16,
-    color: "orange",
+    color: "#ff6347",
     fontWeight: "bold",
   },
   searchContainer: {
