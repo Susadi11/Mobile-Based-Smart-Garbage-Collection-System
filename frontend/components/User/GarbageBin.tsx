@@ -1,49 +1,110 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ref, onValue } from 'firebase/database';
-import { database } from '../../firebaseConfig'; // Import your Firebase config
+import { database } from '../../firebaseConfig'; // Adjust your Firebase config import path
 
-const Dustbin = () => {
-  const [garbageLevel, setGarbageLevel] = useState(0); // Default garbage level
-  const [binDepth, setBinDepth] = useState(0); // Bin depth
-  const [binStatus, setBinStatus] = useState(''); // Bin status
-  const totalHeight = 200; // Total height of the dustbin in pixels
+
+// Define a type for the dustbin data
+type DustbinData = {
+  userId: string;
+  binDepth: number;
+  garbageLevel: number;
+  distance: number;
+  timestamp: string;
+};
+
+const Dustbin: React.FC = () => {
+  const [dustbinData, setDustbinData] = useState<DustbinData[]>([]); // Explicitly set type for state
 
   // Fetch garbage data from Firebase Realtime Database
   useEffect(() => {
-    const garbageRef = ref(database, 'garbageLevel'); // Adjust the path to match your Firebase structure
+    const usersRef = ref(database, 'UsersData'); // Reference to the 'UsersData' node
 
-    // Listen for changes in the data
-    onValue(garbageRef, (snapshot) => {
-      const data = snapshot.val(); // Fetch the whole garbage level object
-      setGarbageLevel(parseFloat(data.garbageLevel)); // Set the fetched garbage level
-      setBinDepth(parseFloat(data.binDepth)); // Set the fetched bin depth
-      setBinStatus(data.binStatus); // Set the bin status (e.g., empty, partially filled)
+    // Listen for changes in the 'UsersData' node
+    onValue(usersRef, (snapshot) => {
+      const data = snapshot.val(); // Get the data snapshot
+      const fetchedData: DustbinData[] = []; // Explicitly define the array type
+
+      // Loop through each user in 'UsersData'
+      if (data) {
+        Object.keys(data).forEach((userId) => {
+          const userReadings = data[userId]?.readings;
+          console.log('User Readings:', userReadings); // Log all readings for this user
+
+          if (userReadings) {
+            // Get only keys that are valid timestamps
+            const readingKeys = Object.keys(userReadings).filter((key) =>
+              /^\d+$/.test(key) // Ensure it's a number (i.e., valid timestamp)
+            );
+            const latestReadingKey = readingKeys.length ? readingKeys.pop() : null; // Ensure the key exists
+
+            if (latestReadingKey) {
+              const latestReading = userReadings[latestReadingKey];
+
+              // Log the latest reading key and data
+              console.log('Latest Reading Key:', latestReadingKey);
+              console.log('Latest Reading Data:', latestReading);
+
+              if (latestReading && typeof latestReading === 'object') {
+                // Push the fetched data to the array
+                fetchedData.push({
+                  userId,
+                  binDepth: parseFloat(latestReading.binDepth) || 0, // Ensure numeric value
+                  garbageLevel: parseFloat(latestReading.garbageLevel) || 0, // Ensure numeric value
+                  distance: parseFloat(latestReading.distance) || 0, // Ensure numeric value
+                  timestamp: latestReading.timestamp || '',
+                });
+
+                // Log the parsed values for further debugging
+                console.log('Parsed Bin Depth:', latestReading.binDepth);
+                console.log('Parsed Garbage Level:', latestReading.garbageLevel);
+              } else {
+                console.log('Unexpected data structure for latestReading:', latestReading);
+              }
+            }
+          }
+        });
+      }
+
+      setDustbinData(fetchedData); // Update the state with the latest readings
     });
   }, []);
 
-  // Calculate the height of the garbage inside the bin based on the level
-  const garbageHeight = (garbageLevel / 100) * totalHeight;
+  // Constant bin height for visualization
+  const totalHeight = 200; // in pixels
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Smart GarbageBin</Text>
-      <View style={styles.binContainer}>
-        {/* Dustbin with lid */}
-        <View style={styles.dustbinContainer}>
-          <View style={styles.binLid} />
-          <View style={styles.dustbin}>
-            {/* Garbage fill */}
-            <View style={[styles.garbage, { height: garbageHeight }]} />
+      <Text style={styles.title}>Smart GarbageBins</Text>
+
+      {/* Render the dustbin data for each user */}
+      {dustbinData.map((item, index) => {
+        const garbageHeight =
+          item.binDepth > 0
+            ? (item.garbageLevel / item.binDepth) * totalHeight
+            : 0; // Fallback in case of invalid data
+
+        return (
+          <View key={index} style={styles.binContainer}>
+            {/* User ID is now positioned above the bin */}
+            <Text style={styles.userIdText}>User ID: {item.userId}</Text>
+            <View style={styles.dustbinContainer}>
+              <View style={styles.binLid} />
+              <View style={styles.dustbin}>
+                {/* Garbage fill */}
+                <View style={[styles.garbage, { height: garbageHeight }]} />
+              </View>
+            </View>
+            {/* Information next to the bin */}
+            <View style={styles.infoContainer}>
+              <Text style={styles.levelText}>Garbage Level: {item.garbageLevel} cm</Text>
+              <Text style={styles.levelText}>Bin Depth: {item.binDepth} cm</Text>
+              <Text style={styles.levelText}>Distance: {item.distance} cm</Text>
+              <Text style={styles.levelText}>Timestamp: {item.timestamp}</Text>
+            </View>
           </View>
-        </View>
-        {/* Text next to the bin */}
-        <View style={styles.infoContainer}>
-          <Text style={styles.levelText}>Garbage Level: {garbageLevel}%</Text>
-          <Text style={styles.levelText}>Bin Depth: {binDepth} m</Text>
-          <Text style={styles.statusText}>Status: {binStatus}</Text>
-        </View>
-      </View>
+        );
+      })}
     </View>
   );
 };
@@ -61,11 +122,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   binContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center', // Align everything center vertically
+    marginBottom: 20,
+    justifyContent: 'center', // Center align items within
   },
   dustbinContainer: {
     alignItems: 'center', // Center the bin and lid
+  },
+  userIdText: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5, // Add some space between userId and the bin
+    color: '#333', // Darker color for better visibility
   },
   binLid: {
     width: 110,
