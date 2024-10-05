@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { ref, onValue } from 'firebase/database';
 import { database } from '../../firebaseConfig'; // Adjust your Firebase config import path
 
+
 // Define a type for the dustbin data
 type DustbinData = {
   userId: string;
